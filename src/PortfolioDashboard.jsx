@@ -900,7 +900,12 @@ function PieChart({ data, size = 220, innerRadiusRatio = 0.62, centerLabel, maxL
   const total = displayData.reduce((sum, d) => sum + d.value, 0);
   if (total <= 0) return null;
 
-  const pad = isNarrow ? 68 : 92; // room for outside labels + leader lines
+  // Estimate space needed for the longest label text so leader-line labels don't get clipped
+  // off the edge of the viewBox on narrow screens (monospace-ish average char width at 11.5px font).
+  const longestLabelChars = Math.max(...displayData.map(d => (d.label + ' 100.0%').length));
+  const estCharWidth = 6.4;
+  const labelTextWidth = longestLabelChars * estCharWidth;
+  const pad = isNarrow ? Math.min(labelTextWidth + 20, 150) : 92; // room for outside labels + leader lines
   const vbSize = size + pad * 2;
   const cx = vbSize / 2, cy = vbSize / 2, r = size / 2 - 6, innerR = r * innerRadiusRatio;
   const labelR = r + 22; // where leader lines break outward
