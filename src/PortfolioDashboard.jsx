@@ -457,6 +457,7 @@ export default function PortfolioDashboard() {
         {tab === 'altin' && (
           <div className="fade-in">
             <Panel title={month.display_name + ' — Fiziki Altın Pozisyonları'} noPad>
+              <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
               <table style={styles.miniTable}>
                 <thead>
                   <tr>
@@ -495,6 +496,7 @@ export default function PortfolioDashboard() {
                   )}
                 </tbody>
               </table>
+              </div>
             </Panel>
             {month.gold_total && (
               <div style={styles.statGrid}>
@@ -599,6 +601,7 @@ export default function PortfolioDashboard() {
                   })()}
                   {btc && (
                     <Panel title="Detaylar">
+                      <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
                       <table style={styles.miniTable}>
                         <tbody>
                           <tr><td style={{...styles.td, color:'#8a94a0'}}>Ortalama Maliyet</td><td style={styles.td}>{typeof btc.avg_cost === 'string' ? btc.avg_cost : fmtNum(btc.avg_cost)}</td></tr>
@@ -606,6 +609,7 @@ export default function PortfolioDashboard() {
                           <tr><td style={{...styles.td, color:'#8a94a0'}}>Para Birimi</td><td style={styles.td}>{btc.currency}</td></tr>
                         </tbody>
                       </table>
+                      </div>
                     </Panel>
                   )}
                 </>
@@ -617,6 +621,7 @@ export default function PortfolioDashboard() {
         {tab === 'etf' && (
           <div className="fade-in">
             <Panel title={month.display_name + ' — Yabancı ETF Pozisyonları'} noPad>
+              <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
               <table style={styles.miniTable}>
                 <thead>
                   <tr>
@@ -645,6 +650,7 @@ export default function PortfolioDashboard() {
                   ))}
                 </tbody>
               </table>
+              </div>
             </Panel>
             {month.usd_try_rate && (
               <div style={{ fontSize: 11.5, color: '#6f7680', fontFamily: 'IBM Plex Mono, monospace', padding: '4px 4px' }}>
