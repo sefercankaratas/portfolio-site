@@ -115,20 +115,6 @@ export default function PortfolioDashboard() {
   const totalChangeSinceStart = month.total_try - firstMonth.total_try;
   const totalChangeSinceStartPct = (month.total_try / firstMonth.total_try - 1);
 
-  // Cumulative cash flow split from the first recorded month up to the selected month:
-  // sum the newMoney/marketMove of each consecutive month-pair, so buys/sells that happen
-  // and reverse in between are captured correctly (not just a single first-vs-last comparison).
-  const cumulativeFlow = useMemo(() => {
-    let newMoney = 0, marketMove = 0;
-    for (let i = 1; i <= monthIdx; i++) {
-      const flow = computeCashFlow(RAW_DATA[MONTH_ORDER[i]], RAW_DATA[MONTH_ORDER[i - 1]]);
-      newMoney += flow.newMoney;
-      marketMove += flow.marketMove;
-    }
-    return { newMoney, marketMove, total: newMoney + marketMove };
-  }, [monthIdx]);
-  const marketReturnPct = firstMonth.total_try ? cumulativeFlow.marketMove / firstMonth.total_try : null;
-
   const historySeries = useMemo(() => {
     return MONTH_ORDER.map((k) => ({ key: k, name: RAW_DATA[k].display_name, total: RAW_DATA[k].total_try }));
   }, []);
@@ -234,16 +220,10 @@ export default function PortfolioDashboard() {
             {/* Summary stat cards */}
             <div style={styles.statGrid}>
               <StatCard
-                label="Toplam Bakiye Değişimi"
+                label="Başlangıçtan bu yana"
                 value={fmtTRY(totalChangeSinceStart, { sign: true })}
-                sub={fmtPct(totalChangeSinceStartPct, { sign: true }) + ' · ' + firstMonth.display_name + '\'tan beri, yeni yatırımlar dahil'}
+                sub={fmtPct(totalChangeSinceStartPct, { sign: true }) + ' · ' + firstMonth.display_name + '\'tan beri'}
                 positive={totalChangeSinceStart >= 0}
-              />
-              <StatCard
-                label="Gerçek Piyasa Getirisi"
-                value={monthIdx > 0 ? fmtTRY(cumulativeFlow.marketMove, { sign: true }) : '—'}
-                sub={monthIdx > 0 ? fmtPct(marketReturnPct, { sign: true }) + ' · yeni para hariç, sadece fiyat hareketi' : 'İlk kayıtlı ay'}
-                positive={monthIdx > 0 ? cumulativeFlow.marketMove >= 0 : undefined}
               />
               <StatCard
                 label="Aylık değişim"
@@ -257,11 +237,6 @@ export default function PortfolioDashboard() {
                 sub={month.report_date + ' kapanışı'}
               />
             </div>
-            {monthIdx > 0 && (
-              <div style={{ fontSize: 11.5, color: '#576270', marginTop: -12, marginBottom: 20 }}>
-                "Toplam Bakiye Değişimi" senin eklediğin yeni parayı da içerir; "Gerçek Piyasa Getirisi" sadece {firstMonth.display_name}'tan beri elindeki varlıkların fiyat hareketini gösterir — bu ay içine yeni eklenen adetler hariçtir.
-              </div>
-            )}
 
             {/* Total value history chart */}
             <Panel title="Toplam Portföy Değeri — Aylık Seyir">
