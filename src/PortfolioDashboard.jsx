@@ -792,39 +792,49 @@ function HistoryChart({ series, activeIdx, min, max }) {
 }
 
 function ComparisonChart({ items }) {
-  const vals = items.map(i => i.value).filter(v => v !== null && v !== undefined);
+  const isNarrow = useIsNarrow();
+  const sorted = [...items].sort((a, b) => {
+    const av = a.value === null || a.value === undefined ? -Infinity : a.value;
+    const bv = b.value === null || b.value === undefined ? -Infinity : b.value;
+    return bv - av;
+  });
+  const vals = sorted.map(i => i.value).filter(v => v !== null && v !== undefined);
   const maxAbs = Math.max(...vals.map(Math.abs), 1);
+
+  const w = 500, h = 260;
+  const padL = isNarrow ? 10 : 20, padR = isNarrow ? 10 : 20, padT = 24, padB = 44;
+  const innerW = w - padL - padR, innerH = h - padT - padB;
+  const zeroY = padT + innerH / 2;
+  const scale = (innerH / 2) / (maxAbs * 1.2);
+
+  const n = sorted.length;
+  const slotW = innerW / n;
+  const barW = Math.min(46, slotW * 0.55);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {items.map((it, i) => {
-        const v = it.value;
-        const has = v !== null && v !== undefined;
-        const widthPct = has ? (Math.abs(v) / maxAbs) * 50 : 0; // each side of zero uses up to 50%
-        const positive = has && v >= 0;
-        return (
-          <div key={i}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13, color: '#d7dee5' }}>
-                <span style={{ width: 9, height: 9, borderRadius: 2, background: it.color, display: 'inline-block' }} />
-                {it.name}
-              </span>
-              <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 13.5, fontWeight: 600, color: !has ? '#6d7885' : (positive ? '#3ecf8e' : '#e8687a') }}>
+    <div style={{ overflowX: isNarrow ? 'visible' : 'auto' }} className="scrollbar-thin">
+      <svg viewBox={'0 0 ' + w + ' ' + h} style={{ width: '100%', minWidth: isNarrow ? 0 : 320, height: 'auto', display: 'block' }}>
+        <line x1={padL} x2={w - padR} y1={zeroY} y2={zeroY} stroke="#4a5560" strokeWidth="1" />
+        {sorted.map((it, i) => {
+          const v = it.value;
+          const has = v !== null && v !== undefined;
+          const x = padL + i * slotW + (slotW - barW) / 2;
+          const barH = has ? Math.abs(v) * scale : 0;
+          const y = has && v >= 0 ? zeroY - barH : zeroY;
+          const labelY = has ? (v >= 0 ? y - 6 : y + barH + 14) : zeroY - 6;
+          return (
+            <g key={i}>
+              <rect x={x} y={y} width={barW} height={Math.max(barH, 1)} fill={has ? it.color : '#2a3542'} rx="2" />
+              <text x={x + barW/2} y={labelY} textAnchor="middle" fontSize="11" fontWeight="600" fontFamily="IBM Plex Mono, monospace" fill={has ? it.color : '#6d7885'}>
                 {has ? (v > 0 ? '+' : '') + v.toFixed(2).replace('.', ',') + '%' : '—'}
-              </span>
-            </div>
-            <div style={{ position: 'relative', height: 8, background: '#0a0e14', borderRadius: 4, overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, background: '#3a4756' }} />
-              {has && (
-                <div style={{
-                  position: 'absolute', top: 0, bottom: 0, background: it.color, borderRadius: 4,
-                  width: widthPct + '%',
-                  left: positive ? '50%' : (50 - widthPct) + '%',
-                }} />
-              )}
-            </div>
-          </div>
-        );
-      })}
+              </text>
+              <text x={x + barW/2} y={h - padB + 16} textAnchor="middle" fontSize="10.5" fill="#a9b4c0" fontFamily="IBM Plex Mono, monospace">
+                {it.name}
+              </text>
+            </g>
+          );
+        })}
+      </svg>
     </div>
   );
 }
