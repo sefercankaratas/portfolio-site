@@ -11,18 +11,37 @@ const TRADES = {"OCAK":{"RYSAS":{"A":[300,14.1145]},"GWIND":{"A":[50,24.88]}},"�
 // Altın/gümüş/kıymetli maden fonları "Fonlar"dan çıkarılıp Kıymetli Madenler'e taşınır.
 const PRECIOUS_CODES = new Set(['TTA', 'MKG', 'DMG', 'YZG']);
 const isPreciousFund = (f) => PRECIOUS_CODES.has(f.code) || /ALTIN|GÜMÜŞ|MADEN|PLATİN|PALADYUM/.test(String(f.name || '').toLocaleUpperCase('tr-TR'));
+const IGNORED_FUNDS = new Set(['KOCMT', 'PATEK', 'BINHO']); // İş Bankası'nda küsuratlı kalan eski kalıntılar, hiç gösterilmez
+const FULL_NAMES = {
+  AGESA: 'Agesa Hayat ve Emeklilik', AKSA: 'Aksa Akrilik Kimya Sanayii', CLEBI: 'Çelebi Hava Servisi', ENJSA: 'Enerjisa Enerji',
+  ENKAI: 'Enka İnşaat ve Sanayi', EREGL: 'Ereğli Demir ve Çelik Fabrikaları', FROTO: 'Ford Otomotiv Sanayi', GWIND: 'Galata Wind Enerji',
+  ISMEN: 'İş Yatırım Menkul Değerler', LOGO: 'Logo Yazılım Sanayi ve Ticaret', MAVI: 'Mavi Giyim Sanayi ve Ticaret', MGROS: 'Migros Ticaret',
+  MPARK: 'MLP Sağlık Hizmetleri', RYGYO: 'Reysaş Gayrimenkul Yatırım Ortaklığı', RYSAS: 'Reysaş Taşımacılık ve Lojistik Ticaret',
+  SISE: 'Türkiye Şişe ve Cam Fabrikaları', TABGD: 'TAB Gıda Sanayi ve Ticaret', TUPRS: 'Tüpraş - Türkiye Petrol Rafinerileri',
+  TTRAK: 'Türk Traktör ve Ziraat Makineleri', VESBE: 'Vestel Beyaz Eşya Sanayi ve Ticaret',
+  TTA: 'İş Portföy Kıymetli Madenler — Altın Fonu', MKG: 'Aktif Portföy Altın Katılım Fonu',
+  DMG: 'Deniz Portföy Gümüş Fon Sepeti Fonu', YZG: 'Yapı Kredi Portföy Gümüş Fon Sepeti Fonu',
+};
 Object.values(RAW_DATA).forEach(m => {
+  const ignoredVal = m.funds.filter(f => IGNORED_FUNDS.has(f.code)).reduce((s, f) => s + f.market_value_try, 0);
+  m.funds = m.funds.filter(f => !IGNORED_FUNDS.has(f.code));
+  m.total_try -= ignoredVal;
   const precious = m.funds.filter(isPreciousFund);
   m.funds = m.funds.filter(f => !isPreciousFund(f));
   m.precious_funds = precious;
   const pv = precious.reduce((s, f) => s + f.market_value_try, 0);
   m.summary.forEach(c => {
-    if (c.key === 'fon') { c.value_try -= pv; c.pct = c.value_try / m.total_try; c.comment = m.funds.length + ' fon'; }
+    if (c.key === 'fon') { c.value_try -= pv + ignoredVal; c.comment = m.funds.length + ' fon'; }
     if (c.key === 'altin') {
-      c.value_try += pv; c.pct = c.value_try / m.total_try;
+      c.value_try += pv;
       c.comment = 'Çeyrek (25) + Bilezik (2)' + (precious.length ? ' + ' + precious.length + ' fon' : '');
       c.category = '🥇 Kıymetli Madenler'; c.clean_name = 'Kıymetli Madenler';
     }
+  });
+  m.summary.forEach(c => { c.pct = c.value_try / m.total_try; });
+  [...m.stocks, ...m.funds, ...m.precious_funds].forEach(x => {
+    x.pct = x.market_value_try / m.total_try;
+    if (FULL_NAMES[x.code]) x.name = FULL_NAMES[x.code];
   });
 });
 
@@ -49,12 +68,12 @@ function fmtTRY(n, opts = {}) {
   if (displayCurrencyState.mode === 'USD' && displayCurrencyState.usdRate) {
     const usdVal = n / displayCurrencyState.usdRate;
     const usdDecimals = opts.decimals !== undefined ? opts.decimals : (Math.abs(usdVal) < 1000 ? 2 : 0);
-    const s = usdVal.toLocaleString('en-US', { minimumFractionDigits: usdDecimals, maximumFractionDigits: usdDecimals });
-    const prefix = sign && usdVal > 0 ? '+' : '';
+    const s = Math.abs(usdVal).toLocaleString('en-US', { minimumFractionDigits: usdDecimals, maximumFractionDigits: usdDecimals });
+    const prefix = usdVal < 0 ? '-' : (sign && usdVal > 0 ? '+' : '');
     return prefix + '$' + s;
   }
-  const s = n.toLocaleString('tr-TR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-  const prefix = sign && n > 0 ? '+' : '';
+  const s = Math.abs(n).toLocaleString('tr-TR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const prefix = n < 0 ? '-' : (sign && n > 0 ? '+' : '');
   return prefix + '₺' + s;
 }
 function fmtPct(n, opts = {}) {
@@ -128,6 +147,7 @@ export default function PortfolioDashboard() {
   displayCurrencyState.mode = currency;
   displayCurrencyState.usdRate = parseFloat(String(month.usd_try_rate).replace(',', '.'));
 
+  const prevFundsAll = prevMonth ? [...prevMonth.funds, ...(prevMonth.precious_funds || [])] : null;
   const bm = (k) => BENCHMARK_DATA[k] ? BENCHMARK_DATA[k][monthKey] : undefined;
   const portfolioPct = prevMonth && prevMonth.total_try ? (computeCashFlow(month, prevMonth).marketMove / prevMonth.total_try) * 100 : undefined;
   const gramGold = month.gold_total ? month.gold_total.current_value_try / month.gold_total.total_gram : null;
@@ -436,6 +456,19 @@ export default function PortfolioDashboard() {
 
         {tab === 'hisse' && (
           <div className="fade-in">
+            {(() => {
+              const st = prevMonth ? categoryStats(month.stocks, prevMonth.stocks) : null;
+              const value = month.stocks.reduce((a, s) => a + s.market_value_try, 0);
+              const pnl = month.stocks.reduce((a, s) => a + (typeof s.pnl === 'number' ? s.pnl : 0), 0);
+              const cost = month.stocks.reduce((a, s) => a + (typeof s.avg_cost === 'number' ? s.avg_cost * s.qty : 0), 0);
+              return (
+                <div style={styles.statGrid}>
+                  <StatCard label="Toplam Değer" value={fmtTRY(value)} sub={fmtPct(value / month.total_try) + ' portföy payı · ' + month.stocks.length + ' hisse'} />
+                  <StatCard label="Kâr/Zarar" value={fmtTRY(pnl, { sign: true })} sub={cost ? fmtPct(pnl / cost, { sign: true }) + ' · maliyete göre' : ''} positive={pnl >= 0} />
+                  {monthlyCards(st, prevMonth)}
+                </div>
+              );
+            })()}
             <Panel title={month.display_name + ' — Sektör Dağılımı'}>
               {(() => {
                 const sectorTotals = {};
@@ -459,19 +492,20 @@ export default function PortfolioDashboard() {
             </Panel>
             <Panel title={month.display_name + ' — Hisse Senedi Pozisyonları (' + month.stocks.length + ' pozisyon)'} noPad>
               <PositionTable
-                columns={['KOD', 'ADI', 'ADET', 'ORT. MALİYET', 'FİYAT', 'DEĞER', 'K/Z', 'K/Z %', 'PAY', 'SEKTÖR']}
+                columns={['KOD', 'ADI', 'ADET', 'ORT. MALİYET', 'FİYAT', 'DEĞER', 'K/Z', 'K/Z %', 'AYLIK %', 'PAY', 'SEKTÖR']}
                 rows={[...month.stocks].sort((a,b)=>b.market_value_try-a.market_value_try).map(s => {
                   const costBasis = typeof s.avg_cost === 'number' && s.qty ? s.avg_cost * s.qty : null;
                   const pnlPct = typeof s.pnl === 'number' && costBasis ? s.pnl / costBasis : null;
                   return [
                     <span style={{ fontWeight: 600, color: '#5de0a8' }}>{s.code}</span>,
-                    s.name,
+                    <NameCell>{s.name}</NameCell>,
                     fmtNum(s.qty),
                     typeof s.avg_cost === 'number' ? fmtTRY(s.avg_cost, {decimals:2}) : '—',
                     fmtTRY(s.price, {decimals:2}),
                     fmtTRY(s.market_value_try),
                     typeof s.pnl === 'number' ? <span style={{ color: s.pnl >= 0 ? '#3ecf8e' : '#e8687a' }}>{fmtTRY(s.pnl, {sign:true})}</span> : '—',
                     pnlPct !== null ? <span style={{ color: pnlPct >= 0 ? '#3ecf8e' : '#e8687a' }}>{fmtPct(pnlPct, {sign:true})}</span> : '—',
+                    pctCell(priceChange(s, prevMonth ? prevMonth.stocks : null, x => x.price)),
                     fmtPct(s.pct),
                     <span style={{ color: '#6d7885' }}>{s.sector}</span>,
                   ];
@@ -486,15 +520,26 @@ export default function PortfolioDashboard() {
 
         {tab === 'fon' && (
           <div className="fade-in">
+            {(() => {
+              const st = prevMonth ? categoryStats(month.funds, prevMonth.funds) : null;
+              const value = month.funds.reduce((a, f) => a + f.market_value_try, 0);
+              return (
+                <div style={styles.statGrid}>
+                  <StatCard label="Toplam Değer" value={fmtTRY(value)} sub={fmtPct(value / month.total_try) + ' portföy payı · ' + month.funds.length + ' fon'} />
+                  {monthlyCards(st, prevMonth)}
+                </div>
+              );
+            })()}
             <Panel title={month.display_name + ' — Yatırım Fonu Pozisyonları (' + month.funds.length + ' fon)'} noPad>
               <PositionTable
-                columns={['KOD', 'ADI', 'ADET', 'BİRİM FİYAT', 'DEĞER', 'PAY', 'PLATFORM']}
+                columns={['KOD', 'ADI', 'ADET', 'BİRİM FİYAT', 'DEĞER', 'AYLIK %', 'PAY', 'PLATFORM']}
                 rows={[...month.funds].sort((a,b)=>b.market_value_try-a.market_value_try).map(f => [
                   <span style={{ fontWeight: 600, color: '#7aa8c9' }}>{f.code}</span>,
-                  f.name,
+                  <NameCell>{f.name}</NameCell>,
                   fmtNum(f.qty),
                   fmtNum(f.unit_price, 4),
                   fmtTRY(f.market_value_try),
+                  pctCell(priceChange(f, prevFundsAll, fundPrice)),
                   fmtPct(f.pct),
                   <span style={{ color: '#6d7885' }}>{f.platform}</span>,
                 ])}
@@ -506,6 +551,27 @@ export default function PortfolioDashboard() {
 
         {tab === 'altin' && (
           <div className="fade-in">
+            {(() => {
+              const g = month.gold_total;
+              const gold = g ? g.current_value_try : 0;
+              const fundsVal = month.precious_funds.reduce((a, f) => a + f.market_value_try, 0);
+              const total = gold + fundsVal;
+              let change = null, market = null, buys = null;
+              if (prevMonth && g && prevMonth.gold_total) {
+                const st = categoryStats(month.precious_funds, prevMonth.precious_funds);
+                const goldDiff = gold - prevMonth.gold_total.current_value_try;
+                change = st.change + goldDiff; market = st.market + goldDiff; buys = st.buys;
+              }
+              return (
+                <div style={styles.statGrid}>
+                  <StatCard label="Toplam Kıymetli Maden" value={fmtTRY(total)} sub={fmtPct(total / month.total_try) + ' portföy payı · fiziki + fon'} />
+                  <StatCard label="Fiziki Altın" value={fmtTRY(gold)} sub={g ? fmtNum(g.total_gram, 2) + ' gr · K/Z ' + fmtPct(g.profit_pct, { sign: true }) : ''} />
+                  <StatCard label="Altın / Gümüş Fonları" value={fmtTRY(fundsVal)} sub={month.precious_funds.length + ' fon · ' + fmtPct(fundsVal / month.total_try) + ' pay'} />
+                  <StatCard label="Aylık Değişim" value={change !== null ? fmtTRY(change, { sign: true }) : '—'}
+                    sub={change !== null ? 'piyasa ' + fmtTRY(market, { sign: true }) + ' · alım ' + fmtTRY(buys) : 'İlk kayıtlı ay'} positive={change !== null ? change >= 0 : undefined} />
+                </div>
+              );
+            })()}
             <Panel title={month.display_name + ' — Fiziki Altın Pozisyonları'} noPad>
               <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
               <table style={styles.miniTable}>
@@ -593,9 +659,10 @@ export default function PortfolioDashboard() {
             {month.precious_funds.length > 0 && (
               <Panel title={month.display_name + ' — Kıymetli Maden Fonları (' + month.precious_funds.length + ' fon)'} noPad>
                 <PositionTable
-                  columns={['KOD', 'ADI', 'ADET', 'BİRİM FİYAT', 'DEĞER', 'PLATFORM']}
+                  columns={['KOD', 'ADI', 'ADET', 'BİRİM FİYAT', 'DEĞER', 'AYLIK %', 'PAY', 'PLATFORM']}
                   rows={[...month.precious_funds].sort((a,b)=>b.market_value_try-a.market_value_try).map(f => [
-                    <span style={{ fontWeight: 600, color: '#e8b84b' }}>{f.code}</span>, f.name, fmtNum(f.qty), fmtNum(f.unit_price, 4), fmtTRY(f.market_value_try),
+                    <span style={{ fontWeight: 600, color: '#e8b84b' }}>{f.code}</span>, <NameCell>{f.name}</NameCell>, fmtNum(f.qty), fmtNum(f.unit_price, 4), fmtTRY(f.market_value_try),
+                    pctCell(priceChange(f, prevFundsAll, fundPrice)), fmtPct(f.pct),
                     <span style={{ color: '#6d7885' }}>{f.platform}</span>,
                   ])}
                 />
@@ -683,6 +750,20 @@ export default function PortfolioDashboard() {
 
         {tab === 'etf' && (
           <div className="fade-in">
+            {(() => {
+              const a = month.crypto_etf.find(c => c.asset === 'VOO');
+              if (!a) return null;
+              const pa = prevMonth ? prevMonth.crypto_etf.find(c => c.asset === 'VOO') : null;
+              const diff = pa ? a.total_value_try - pa.total_value_try : null;
+              return (
+                <div style={styles.statGrid}>
+                  <StatCard label="Değer (TL)" value={fmtTRY(a.total_value_try)} sub={fmtPct(a.total_value_try / month.total_try) + ' portföy payı'} />
+                  <StatCard label="Miktar" value={fmtNum(a.qty, 6) + ' adet'} sub={'$' + fmtNum(a.current_price, 2) + ' / adet'} />
+                  <StatCard label="Kâr/Zarar %" value={typeof a.profit_pct === 'number' ? fmtPct(a.profit_pct, { sign: true }) : '—'} sub="Maliyete göre" positive={typeof a.profit_pct === 'number' ? a.profit_pct >= 0 : undefined} />
+                  <StatCard label="Aylık Değişim" value={diff !== null ? fmtTRY(diff, { sign: true }) : '—'} sub={pa ? prevMonth.display_name + "'a göre" : 'İlk kayıt'} positive={diff !== null ? diff >= 0 : undefined} />
+                </div>
+              );
+            })()}
             <Panel title={month.display_name + ' — Yabancı ETF Pozisyonları'} noPad>
               <div style={{ overflowX: 'auto' }} className="scrollbar-thin">
               <table style={styles.miniTable}>
@@ -933,6 +1014,36 @@ function PositionTable({ columns, rows }) {
     </div>
   );
 }
+
+function categoryStats(curList, prevList) {
+  const pm = Object.fromEntries(prevList.map(p => [p.code, p]));
+  const cm = Object.fromEntries(curList.map(c => [c.code, c]));
+  let buys = 0, sells = 0, market = 0;
+  curList.forEach(c => {
+    const p = pm[c.code], cv = c.market_value_try;
+    if (p) {
+      const byQty = (c.qty - p.qty) * (c.qty ? cv / c.qty : 0);
+      if (byQty >= 0) buys += byQty; else sells += byQty;
+      market += (cv - p.market_value_try) - byQty;
+    } else buys += cv;
+  });
+  prevList.forEach(p => { if (!cm[p.code]) sells -= p.market_value_try; });
+  const value = curList.reduce((a, x) => a + x.market_value_try, 0);
+  const prevValue = prevList.reduce((a, x) => a + x.market_value_try, 0);
+  return { value, prevValue, change: value - prevValue, buys, sells, market };
+}
+const priceChange = (item, prevList, priceOf) => {
+  const p = prevList && prevList.find(x => x.code === item.code);
+  const a = p && priceOf(p), b = priceOf(item);
+  return a && b ? b / a - 1 : null;
+};
+const pctCell = v => (v === null || v === undefined) ? '—' : <span style={{ color: v >= 0 ? '#3ecf8e' : '#e8687a' }}>{fmtPct(v, { sign: true })}</span>;
+const NameCell = ({ children }) => <span style={{ display: 'inline-block', minWidth: 170, whiteSpace: 'normal', lineHeight: 1.35 }}>{children}</span>;
+const monthlyCards = (st, prevMonth) => ([
+  <StatCard key="chg" label="Aylık Değişim" value={st ? fmtTRY(st.change, { sign: true }) : '—'}
+    sub={st ? 'piyasa ' + fmtTRY(st.market, { sign: true }) + ' · alım ' + fmtTRY(st.buys) : 'İlk kayıtlı ay'} positive={st ? st.change >= 0 : undefined} />,
+  <StatCard key="buy" label="Ay İçi Alım" value={st ? fmtTRY(st.buys) : '—'} sub={st ? 'satış: ' + fmtTRY(Math.abs(st.sells)) : ''} />,
+]);
 
 const fundPrice = f => f.unit_price != null ? f.unit_price : (f.qty ? f.market_value_try / f.qty : null);
 
