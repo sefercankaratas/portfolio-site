@@ -19,6 +19,25 @@ const FULL_NAMES = {
   MPARK: 'MLP Sağlık Hizmetleri', RYGYO: 'Reysaş Gayrimenkul Yatırım Ortaklığı', RYSAS: 'Reysaş Taşımacılık ve Lojistik Ticaret',
   SISE: 'Türkiye Şişe ve Cam Fabrikaları', TABGD: 'TAB Gıda Sanayi ve Ticaret', TUPRS: 'Tüpraş - Türkiye Petrol Rafinerileri',
   TTRAK: 'Türk Traktör ve Ziraat Makineleri', VESBE: 'Vestel Beyaz Eşya Sanayi ve Ticaret',
+  ZFB: 'Ak Portföy Fintek ve Blokzinciri Teknolojileri Değişken Fon', GPT: 'Aktif Portföy Robotik Teknolojileri Değişken Fon',
+  CPU: 'Aktif Portföy Teknoloji Katılım Fonu', URA: 'Ata Portföy Enerji Değişken Fon',
+  JET: 'Ata Portföy Havacılık ve Savunma Teknolojileri Değişken Fon', RTG: 'Ata Portföy Robotik Teknolojileri Değişken Fon',
+  DVT: 'Deniz Portföy Metaverse ve Dijital Yaşam Teknolojileri Değişken Fon', DBH: 'Deniz Portföy Eurobond (Döviz) Borçlanma Araçları Fonu',
+  DHM: 'Deniz Portföy ESG Sürdürülebilirlik Fon Sepeti Fonu', GID: 'Garanti Portföy İnşaat Sektörü Hisse Senedi Fonu',
+  GVI: 'Garanti Portföy Üçüncü Fon Sepeti Fonu', GBG: 'Inveo Portföy G-20 Ülkeleri Yabancı Hisse Senedi Fonu',
+  GJB: 'Inveo Portföy Gedik Portföy Birinci Fon Sepeti Fonu', IEV: 'İş Portföy Havacılık ve Savunma Teknolojileri Değişken Fon',
+  ITP: 'İş Portföy Teknoloji Karma Fon', IJC: 'İş Portföy Yarı İletken Teknolojileri Değişken Fon',
+  IPV: 'İş Portföy Eurobond (Döviz) Borçlanma Araçları Fonu', TGE: 'İş Portföy Emtia Yabancı BYF Fon Sepeti Fonu',
+  OJT: 'QNB Portföy Teknoloji Fon Sepeti Fonu', OLD: 'QNB Portföy Temiz Enerji ve Su Fon Sepeti Fonu',
+  CPT: 'Rota Portföy Çip Teknolojileri Değişken Fon', AN1: 'Strateji Portföy Birinci Değişken Fon',
+  TCD: 'Tacirler Portföy Değişken Fon', YJK: 'Yapı Kredi Portföy Robotik ve Yarı İletken Teknolojileri Fon Sepeti Fonu',
+  YTD: 'Yapı Kredi Portföy Yabancı Fon Sepeti Fonu', ZDZ: 'Ziraat Portföy Agresif Değişken Fon',
+  AAV: 'Ata Portföy İkinci Değişken Fon', AES: 'Ak Portföy Petrol Yabancı BYF Fon Sepeti', GSP: 'Azimut PYŞ Kar Payı Fonu',
+  NHY: 'Neo Portföy Birinci Değişken Fon', KPH: 'İş Portföy Kar Payı Fonu', NPH: 'Nurol Portföy Birinci Değişken Fon',
+  ICF: 'TEB Portföy Birinci Hisse Senedi Fonu', HVS: 'HSBC Portföy Hisse Senedi Fonu', MAC: 'Marmara Capital Portföy Hisse Senedi Fonu',
+  OPH: 'Osmanlı Portföy Birinci Hisse Senedi Fonu', GO9: 'One Portföy Birinci Hisse Senedi Fonu',
+  KHA: 'Pardus Portföy İkinci Hisse Senedi Fonu', BDS: 'Pardus Portföy BIST 30 Dışı Hisse Senedi Fonu',
+  'APLIB.F': 'Ak Portföy BIST Likit Banka Endeksi Fonu',
   TTA: 'İş Portföy Kıymetli Madenler — Altın Fonu', MKG: 'Aktif Portföy Altın Katılım Fonu',
   DMG: 'Deniz Portföy Gümüş Fon Sepeti Fonu', YZG: 'Yapı Kredi Portföy Gümüş Fon Sepeti Fonu',
 };
@@ -530,6 +549,7 @@ export default function PortfolioDashboard() {
                 </div>
               );
             })()}
+            <FundGroupPanel title={month.display_name + ' — Varlık Grubuna Göre Fon Dağılımı'} funds={month.funds} prevFunds={prevMonth ? prevMonth.funds : null} />
             <Panel title={month.display_name + ' — Yatırım Fonu Pozisyonları (' + month.funds.length + ' fon)'} noPad>
               <PositionTable
                 columns={['KOD', 'ADI', 'ADET', 'BİRİM FİYAT', 'DEĞER', 'AYLIK %', 'PAY', 'PLATFORM']}
@@ -1044,6 +1064,58 @@ const monthlyCards = (st, prevMonth) => ([
     sub={st ? 'piyasa ' + fmtTRY(st.market, { sign: true }) + ' · alım ' + fmtTRY(st.buys) : 'İlk kayıtlı ay'} positive={st ? st.change >= 0 : undefined} />,
   <StatCard key="buy" label="Ay İçi Alım" value={st ? fmtTRY(st.buys) : '—'} sub={st ? 'satış: ' + fmtTRY(Math.abs(st.sells)) : ''} />,
 ]);
+
+const FUND_GROUPS = [
+  { label: 'BIST Hisse Senedi Fonları', color: '#3ecf8e', codes: ['HVS','MAC','OPH','GO9','KHA','BDS','ICF','GID','APLIB.F'], re: /HİSSE/ },
+  { label: 'Teknoloji · Yarı İletken · Robotik · Fintek', color: '#5b8fd9', codes: ['ITP','OJT','CPU','CPT','IJC','YJK','RTG','GPT','ZFB','DVT'], re: /TEKNOLOJİ|YARI İLETKEN|ROBOTİK|ÇİP|FİNTEK/ },
+  { label: 'Havacılık & Savunma', color: '#c07de0', codes: ['IEV','JET'], re: /HAVACILIK|SAVUNMA/ },
+  { label: 'Enerji & Emtia', color: '#e8a856', codes: ['URA','OLD','TGE','AES'], re: /ENERJİ|EMTİA|PETROL/ },
+  { label: 'Yabancı Hisse / Yabancı Fon Sepeti', color: '#5de0c4', codes: ['GBG','YTD'], re: /YABANCI/ },
+  { label: 'Eurobond / Döviz Borçlanma', color: '#e87d9a', codes: ['DBH','IPV'], re: /EUROBOND|BORÇLANMA/ },
+  { label: 'Karma · Değişken · Fon Sepeti', color: '#8a94a0', codes: ['GVI','GJB','AN1','TCD','ZDZ','DHM','AAV','NHY','NPH','GSP','KPH'] },
+];
+function fundGroupOf(f) {
+  const hit = FUND_GROUPS.find(g => g.codes.includes(f.code));
+  if (hit) return hit;
+  const n = String(f.name || '').toLocaleUpperCase('tr-TR');
+  return FUND_GROUPS.find(g => g.re && g.re.test(n)) || FUND_GROUPS[FUND_GROUPS.length - 1];
+}
+function FundGroupPanel({ title, funds, prevFunds }) {
+  const total = funds.reduce((a, f) => a + f.market_value_try, 0) || 1;
+  const groups = FUND_GROUPS.map(g => {
+    const cur = funds.filter(f => fundGroupOf(f) === g);
+    const prev = prevFunds ? prevFunds.filter(f => fundGroupOf(f) === g) : null;
+    const st = prev ? categoryStats(cur, prev) : null;
+    return { g, cur, value: cur.reduce((a, f) => a + f.market_value_try, 0), ret: st && st.prevValue > 0 ? st.market / st.prevValue : null };
+  }).filter(x => x.cur.length > 0).sort((a, b) => b.value - a.value);
+  return (
+    <Panel title={title}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {groups.map(({ g, cur, value, ret }) => (
+          <div key={g.label}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 5 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13.5, color: '#d7dee5', fontWeight: 500 }}>
+                <span style={{ width: 9, height: 9, borderRadius: 2, background: g.color, display: 'inline-block' }} />
+                {g.label} <span style={{ color: '#6d7885', fontSize: 11.5, fontWeight: 400 }}>· {cur.length} fon</span>
+              </span>
+              <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 13, color: '#a9b4c0' }}>
+                {fmtTRY(value)} <span style={{ color: '#6d7885', fontSize: 11.5 }}>({fmtPct(value / total)})</span>
+                {ret !== null && <span style={{ marginLeft: 8, color: ret >= 0 ? '#3ecf8e' : '#e8687a' }}>{fmtPct(ret, { sign: true })} ay</span>}
+              </span>
+            </div>
+            <div style={styles.barTrack}><div className="bar-fill" style={{ ...styles.barFillBase, width: (value / total * 100) + '%', background: g.color }} /></div>
+            <div style={{ fontSize: 11, color: '#6d7885', marginTop: 4, fontFamily: 'IBM Plex Mono, monospace', lineHeight: 1.6 }}>
+              {[...cur].sort((a, b) => b.market_value_try - a.market_value_try).map(f => f.code + ' ' + fmtTRY(f.market_value_try)).join('  ·  ')}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ fontSize: 11, color: '#576270', marginTop: 14 }}>
+        Gruplama fonun adına/türüne göredir; fonun içindeki gerçek varlık ağırlığı (TEFAS portföy dağılımı) değildir. Altın/gümüş fonları Kıymetli Madenler sekmesindedir. "ay" = o ayki fiyat etkisi.
+      </div>
+    </Panel>
+  );
+}
 
 const fundPrice = f => f.unit_price != null ? f.unit_price : (f.qty ? f.market_value_try / f.qty : null);
 
