@@ -227,6 +227,27 @@ export default function PortfolioDashboard() {
         @media (max-width: 580px) { .portfolio-sidebar { display: none; } .portfolio-content { margin-left: 0; } .portfolio-content .portfolio-mobile-tabs { display: flex !important; } }
         @media (min-width: 581px) { .portfolio-content .portfolio-mobile-tabs { display: none !important; } }
         .portfolio-content .row-hover:hover { background: #14354a !important; }
+        /* Premium dashboard layout: retain every existing chart, table and calculation. */
+        .portfolio-content { background: radial-gradient(ellipse at 70% 0%,rgba(23,108,126,.18),transparent 44%),#071322; min-height:100vh; }
+        .portfolio-sidebar { background:linear-gradient(180deg,#071c2d,#061322 80%); box-shadow:12px 0 40px rgba(0,0,0,.16); padding-top:35px; }
+        .portfolio-sidebar-brand { font-size:22px; padding-bottom:46px; }
+        .portfolio-sidebar-button { margin:3px 0; font-size:13px; font-weight:600; }
+        .portfolio-content header { border-bottom:0!important; padding-top:42px!important; padding-bottom:30px!important; }
+        .portfolio-content header h1 { font-size:clamp(28px,3vw,43px)!important; font-weight:800!important; letter-spacing:-.055em!important; }
+        .portfolio-content header > div { align-items:center!important; }
+        .portfolio-content main { padding-top:28px!important; }
+        .overview-dashboard { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(290px,1fr); gap:20px; align-items:start; }
+        .overview-dashboard > .dashboard-stats { grid-column:1/-1; display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:18px!important; margin-bottom:3px!important; }
+        .dashboard-stat { background:linear-gradient(145deg,#102d41,#0b2133)!important; border:1px solid #234459!important; border-radius:18px!important; padding:24px!important; box-shadow:0 12px 32px rgba(0,0,0,.14); min-width:0; }
+        .dashboard-stat > div:nth-child(2) { font-size:clamp(20px,2vw,29px)!important; letter-spacing:-.045em!important; }
+        .overview-dashboard > .dashboard-panel { min-width:0; margin:0!important; border:1px solid #234459!important; border-radius:18px!important; background:linear-gradient(145deg,#10283b,#0b1d2d)!important; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.12); }
+        .overview-dashboard > .dashboard-panel:first-of-type { grid-column:1/-1; }
+        .overview-dashboard > .dashboard-panel:nth-of-type(n+5) { grid-column:1/-1; }
+        .dashboard-panel > div:first-child { color:#dceef5!important; font-weight:700!important; font-size:14px!important; letter-spacing:.01em!important; padding:19px 22px!important; }
+        .portfolio-content .month-btn { border-radius:9px!important; margin:8px 3px!important; }
+        .portfolio-content .month-btn:hover { background:#164054!important; }
+        @media(max-width:1100px) { .overview-dashboard { grid-template-columns:1fr; } .overview-dashboard > .dashboard-panel { grid-column:1/-1!important; } }
+        @media(max-width:650px) { .overview-dashboard > .dashboard-stats { grid-template-columns:1fr!important; } .portfolio-content header > div { align-items:flex-start!important; } }
         .portfolio-content button:focus-visible, .portfolio-sidebar-button:focus-visible { outline: 2px solid #39e8c6; outline-offset: 2px; }
 
       `}</style>
@@ -265,8 +286,8 @@ export default function PortfolioDashboard() {
       <header style={styles.header}>
         <div style={styles.headerInner}>
           <div>
-            <div style={styles.kicker}>PORTFÖY DEFTERİ</div>
-            <h1 style={styles.title}>Sefer'in Varlık Raporu</h1>
+            <div style={styles.kicker}>● YATIRIM KONTROL MERKEZİ <span style={{color:"#7f9bb2",marginLeft:12}}> / {month.report_date}</span></div>
+            <h1 style={styles.title}>Portföy <span style={{color:'#41e9cb'}}>Genel Bakış</span></h1><div style={{color:'#8da9bc',fontSize:13,marginTop:10}}>Varlıkların, performansın ve aylık yatırım raporların tek ekranda.</div>
           </div>
           <div style={styles.headerTotal}>
             <button
@@ -338,9 +359,9 @@ export default function PortfolioDashboard() {
         </div>
 
         {tab === 'genel' && (
-          <div className="fade-in">
+          <div className="fade-in overview-dashboard">
             {/* Summary stat cards */}
-            <div style={styles.statGrid}>
+            <div className="dashboard-stats" style={styles.statGrid}>
               <StatCard
                 label="Başlangıçtan bu yana"
                 value={fmtTRY(totalChangeSinceStart, { sign: true })}
@@ -897,7 +918,7 @@ export default function PortfolioDashboard() {
 
 function StatCard({ label, value, sub, positive }) {
   return (
-    <div style={styles.statCard}>
+    <div className="dashboard-stat" style={styles.statCard}>
       <div style={styles.statLabel}>{label}</div>
       <div style={{ ...styles.statValue, color: positive === undefined ? '#eef2f5' : (positive ? '#3ecf8e' : '#e8687a') }}>{value}</div>
       <div style={styles.statSub}>{sub}</div>
@@ -907,7 +928,7 @@ function StatCard({ label, value, sub, positive }) {
 
 function Panel({ title, children, noPad }) {
   return (
-    <div style={styles.panel}>
+    <div className="dashboard-panel" style={styles.panel}>
       <div style={styles.panelTitle}>{title}</div>
       <div style={{ padding: noPad ? 0 : '18px 20px 20px' }}>{children}</div>
     </div>
