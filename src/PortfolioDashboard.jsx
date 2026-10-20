@@ -391,7 +391,7 @@ export default function PortfolioDashboard() {
                               <span style={{ width: 8, height: 8, borderRadius: 999, background: x.color }} />
                               <span style={{ fontSize: 12, color: '#a9b4c0' }}>{x.label}</span>
                             </div>
-                            <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 14, color: '#d7dee5', marginTop: 3 }}>{fmtTRY(x.value, {sign:true})}</div>
+                            <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 14, color: '#e4edf8', marginTop: 3 }}>{fmtTRY(x.value, {sign:true})}</div>
                           </div>
                         ))}
                       </div>
@@ -448,7 +448,7 @@ export default function PortfolioDashboard() {
                       <div style={{ marginTop: 6, paddingTop: 12, borderTop: '1px solid #2a3542' }}>
                         <div style={{ fontSize: 11.5, color: '#6d7885', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>En Çok Artan Varlık</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', fontFamily: 'IBM Plex Mono, monospace', fontSize: 13 }}>
-                          <span style={{ color: '#d7dee5', fontWeight: 600 }}>{meta.label}</span>
+                          <span style={{ color: '#e4edf8', fontWeight: 600 }}>{meta.label}</span>
                           <span style={{ color: '#3ecf8e' }}>+{fmtTRY(mostGrown.diff)}</span>
                         </div>
                       </div>
@@ -1109,7 +1109,7 @@ function Heatmap({ items, height = 300, minShare = 0.09, note }) {
                 background: heatColor(tl.ret), padding: '6px 8px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <div style={{ fontSize: showRet ? 12.5 : 10, fontWeight: 600, color: '#eef2f5', lineHeight: 1.25 }}>{tl.label}</div>
               {showRet && <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 16, fontWeight: 700, color: '#fff', marginTop: 2 }}>{hasRet ? fmtPct(tl.ret, { sign: true }) : '—'}</div>}
-              {showSub && tl.sub && <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: '#d7dee5', opacity: 0.85, marginTop: 3, lineHeight: 1.3 }}>{tl.sub}</div>}
+              {showSub && tl.sub && <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: '#e4edf8', opacity: 0.85, marginTop: 3, lineHeight: 1.3 }}>{tl.sub}</div>}
             </div>
           );
         })}
@@ -1159,7 +1159,7 @@ function FundGroupPanel({ title, funds, prevFunds }) {
         {groups.map(({ g, cur, value, ret }) => (
           <div key={g.label}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 10, flexWrap: 'wrap', marginBottom: 5 }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13.5, color: '#d7dee5', fontWeight: 500 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 13.5, color: '#e4edf8', fontWeight: 500 }}>
                 <span style={{ width: 9, height: 9, borderRadius: 2, background: g.color, display: 'inline-block' }} />
                 {g.label} <span style={{ color: '#6d7885', fontSize: 11.5, fontWeight: 400 }}>· {cur.length} fon</span>
               </span>
@@ -1409,7 +1409,7 @@ function PieChart({ data, size = 220, innerRadiusRatio = 0.62, centerLabel, maxL
           </div>
           {othersItems.map((item, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5 }}>
-              <span style={{ color: '#d7dee5' }}>{item.label}</span>
+              <span style={{ color: '#e4edf8' }}>{item.label}</span>
               <span style={{ fontFamily: 'IBM Plex Mono, monospace', color: '#a9b4c0' }}>{fmtPct(item.value / total)}</span>
             </div>
           ))}
@@ -1420,38 +1420,38 @@ function PieChart({ data, size = 220, innerRadiusRatio = 0.62, centerLabel, maxL
 }
 
 const styles = {
-  ticker: { position: 'relative', zIndex: 1, background: '#10151d', borderBottom: '1px solid #232d38', overflowX: 'auto' },
-  tickerInner: { maxWidth: 1100, margin: '0 auto', padding: '8px 24px', display: 'flex', gap: 28, alignItems: 'center', fontFamily: 'IBM Plex Mono, monospace', fontSize: 12 },
+  ticker: { position: 'relative', zIndex: 1, background: 'rgba(5, 20, 37, 0.88)', borderBottom: '1px solid rgba(83, 153, 205, 0.22)', overflowX: 'auto' },
+  tickerInner: { maxWidth: 1440, margin: '0 auto', padding: '8px 24px', display: 'flex', gap: 28, alignItems: 'center', fontFamily: 'IBM Plex Mono, monospace', fontSize: 12 },
   currencyToggle: {
-    background: '#1c2530', border: '1px solid #2a3542', borderRadius: 999,
+    background: '#1c2530', border: '1px solid rgba(83, 153, 205, 0.30)', borderRadius: 999,
     padding: '5px 12px', marginBottom: 10, cursor: 'pointer',
-    fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, color: '#d7dee5',
+    fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, color: '#e4edf8',
   },
   page: {
     minHeight: '100vh',
-    background: '#0d1117',
-    color: '#d7dee5',
-    fontFamily: '"Fraunces", Georgia, serif',
+    background: 'linear-gradient(135deg, #061426 0%, #071b30 48%, #061322 100%)',
+    color: '#e4edf8',
+    fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif',
     position: 'relative',
   },
   bgTexture: {
     position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0,
-    backgroundImage: 'radial-gradient(circle at 15% 8%, rgba(62,207,142,0.07), transparent 40%), radial-gradient(circle at 85% 90%, rgba(91,143,217,0.07), transparent 40%)',
+    backgroundImage: 'radial-gradient(circle at 15% 8%, rgba(0,224,178,0.10), transparent 42%), radial-gradient(circle at 85% 90%, rgba(38,132,255,0.10), transparent 40%)',
   },
   header: {
     position: 'relative', zIndex: 1,
-    borderBottom: '1px solid #232d38',
-    padding: '28px 24px 24px',
+    borderBottom: '1px solid rgba(83, 153, 205, 0.22)',
+    padding: '30px 26px 26px',
   },
   headerInner: {
-    maxWidth: 1100, margin: '0 auto',
+    maxWidth: 1440, margin: '0 auto',
     display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16,
   },
   kicker: {
     fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, letterSpacing: '0.18em', color: '#3ecf8e', marginBottom: 6,
   },
   title: {
-    fontSize: 30, fontWeight: 600, margin: 0, letterSpacing: '-0.01em', color: '#eef2f5',
+    fontSize: 32, fontWeight: 700, margin: 0, letterSpacing: '-0.01em', color: '#eef2f5',
   },
   headerTotal: { textAlign: 'right' },
   headerTotalLabel: { fontFamily: 'IBM Plex Mono, monospace', fontSize: 11, color: '#6d7885', letterSpacing: '0.05em' },
@@ -1460,22 +1460,22 @@ const styles = {
 
   monthBar: {
     position: 'relative', zIndex: 1,
-    borderBottom: '1px solid #232d38', background: '#10151d',
+    borderBottom: '1px solid rgba(83, 153, 205, 0.22)', background: 'rgba(5, 20, 37, 0.88)',
   },
   monthBarInner: {
-    maxWidth: 1100, margin: '0 auto', display: 'flex', overflowX: 'auto', WebkitOverflowScrolling: 'touch',
+    maxWidth: 1440, margin: '0 auto', display: 'flex', overflowX: 'auto', WebkitOverflowScrolling: 'touch',
   },
   monthBtn: {
     background: 'none', border: 'none', borderRight: '1px solid #232d38', cursor: 'pointer',
     padding: '14px 22px', color: '#6d7885', fontFamily: '"Fraunces", serif', textAlign: 'left', flexShrink: 0,
   },
   monthBtnActive: {
-    color: '#eef2f5', background: 'rgba(62,207,142,0.08)', boxShadow: 'inset 0 -2px 0 #3ecf8e',
+    color: '#eef2f5', background: 'rgba(0,224,178,0.12)', boxShadow: 'inset 0 -2px 0 #3ecf8e',
   },
 
-  main: { position: 'relative', zIndex: 1, maxWidth: 1100, margin: '0 auto', padding: '28px 24px 60px' },
+  main: { position: 'relative', zIndex: 1, maxWidth: 1440, margin: '0 auto', padding: '30px 26px 64px' },
 
-  tabs: { display: 'flex', gap: 24, marginBottom: 26, borderBottom: '1px solid #232d38', overflowX: 'auto', WebkitOverflowScrolling: 'touch' },
+  tabs: { display: 'flex', gap: 24, marginBottom: 26, borderBottom: '1px solid rgba(83, 153, 205, 0.22)', overflowX: 'auto', WebkitOverflowScrolling: 'touch' },
   tabBtn: {
     background: 'none', border: 'none', cursor: 'pointer', padding: '0 0 12px',
     fontFamily: 'IBM Plex Mono, monospace', fontSize: 12.5, letterSpacing: '0.04em', whiteSpace: 'nowrap', flexShrink: 0,
@@ -1485,23 +1485,23 @@ const styles = {
     display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 14, marginBottom: 24,
   },
   statCard: {
-    background: '#141a23', border: '1px solid #232d38', borderRadius: 10, padding: '16px 18px',
+    background: 'linear-gradient(145deg, rgba(12, 36, 60, 0.96), rgba(6, 24, 43, 0.96))', border: '1px solid rgba(83, 153, 205, 0.28)', borderRadius: 16, padding: '20px 21px', boxShadow: '0 10px 28px rgba(0, 0, 0, 0.16)', transition: 'transform 180ms ease, border-color 180ms ease',
   },
   statLabel: { fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5, color: '#6d7885', letterSpacing: '0.06em', textTransform: 'uppercase' },
   statValue: { fontSize: 21, fontWeight: 600, marginTop: 7, fontFamily: '"Fraunces", serif' },
   statSub: { fontSize: 11.5, color: '#576270', marginTop: 5, fontFamily: 'IBM Plex Mono, monospace' },
 
   panel: {
-    background: '#141a23', border: '1px solid #232d38', borderRadius: 12, marginBottom: 20, overflow: 'hidden',
+    background: 'linear-gradient(145deg, rgba(10, 31, 53, 0.96), rgba(5, 23, 41, 0.96))', border: '1px solid rgba(83, 153, 205, 0.25)', borderRadius: 17, marginBottom: 20, overflow: 'hidden', boxShadow: '0 12px 32px rgba(0, 0, 0, 0.14)',
   },
   panelTitle: {
     padding: '16px 20px', fontFamily: 'IBM Plex Mono, monospace', fontSize: 12, letterSpacing: '0.05em',
-    color: '#3ecf8e', borderBottom: '1px solid #232d38', textTransform: 'uppercase',
+    color: '#3ecf8e', borderBottom: '1px solid rgba(83, 153, 205, 0.22)', textTransform: 'uppercase',
   },
 
-  twoCol: { display: 'grid', gridTemplateColumns: '1.1fr 0.9fr', gap: 20 },
+  twoCol: { display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(0, 0.9fr)', gap: 20 },
 
-  barTrack: { height: 7, background: '#0a0e14', borderRadius: 4, overflow: 'hidden' },
+  barTrack: { height: 7, background: '#061426', borderRadius: 4, overflow: 'hidden' },
   barFillBase: { height: '100%', borderRadius: 4 },
 
   noteRow: { display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' },
@@ -1509,11 +1509,11 @@ const styles = {
   miniTable: { width: '100%', borderCollapse: 'collapse', fontSize: 12.5 },
   th: {
     textAlign: 'left', padding: '10px 14px', fontFamily: 'IBM Plex Mono, monospace', fontSize: 10.5,
-    color: '#6d7885', letterSpacing: '0.05em', textTransform: 'uppercase', borderBottom: '1px solid #232d38',
-    position: 'sticky', top: 0, background: '#141a23',
+    color: '#6d7885', letterSpacing: '0.05em', textTransform: 'uppercase', borderBottom: '1px solid rgba(83, 153, 205, 0.22)',
+    position: 'sticky', top: 0, background: '#0b243c',
   },
   td: {
-    padding: '9px 14px', borderBottom: '1px solid #1c2530', fontFamily: 'IBM Plex Mono, monospace', color: '#d7dee5',
+    padding: '9px 14px', borderBottom: '1px solid #1c2530', fontFamily: 'IBM Plex Mono, monospace', color: '#e4edf8',
     fontSize: 12.5,
   },
 
