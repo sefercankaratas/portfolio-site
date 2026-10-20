@@ -164,37 +164,6 @@ export default function PortfolioDashboard() {
         .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
         .scrollbar-thin::-webkit-scrollbar-thumb { background: #3a3530; border-radius: 4px; }
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
-
-        /* Portfolio dashboard polish: focus states, clearer surfaces and responsive layout. */
-        button { -webkit-tap-highlight-color: transparent; }
-        button:focus-visible { outline: 2px solid #3ecf8e !important; outline-offset: 3px; }
-        .tab-btn:hover, .month-btn:hover { color: #eef2f5 !important; }
-        .row-hover { transition: background 0.18s ease; }
-        @media (max-width: 760px) {
-          header { padding: 22px 16px 18px !important; }
-          header h1 { font-size: clamp(23px, 6vw, 30px) !important; line-height: 1.15; }
-          header > div { min-width: 0; }
-          main { padding: 20px 14px 36px !important; }
-          main > div:first-child { gap: 16px !important; }
-          .monthBarInner { padding: 0 8px; }
-          .month-btn { padding: 12px 15px !important; }
-          .tab-btn { font-size: 11px !important; }
-          .statGrid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
-          .twoCol { grid-template-columns: minmax(0, 1fr) !important; gap: 0 !important; }
-          .panel { border-radius: 10px !important; margin-bottom: 14px !important; }
-          .panelTitle { padding: 13px 14px !important; font-size: 10.5px !important; }
-          .miniTable { min-width: 620px; }
-          .scrollbar-thin { max-width: 100%; overflow-x: auto !important; }
-        }
-        @media (max-width: 420px) {
-          .statGrid { grid-template-columns: minmax(0, 1fr) !important; }
-          header h1 { font-size: 23px !important; }
-          .headerTotalValue { font-size: 26px !important; }
-          .month-btn { padding: 11px 12px !important; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
-        }
       `}</style>
 
       <div style={styles.bgTexture} />
@@ -277,7 +246,7 @@ export default function PortfolioDashboard() {
         {tab === 'genel' && (
           <div className="fade-in">
             {/* Summary stat cards */}
-            <div className="statGrid" style={styles.statGrid}>
+            <div style={styles.statGrid}>
               <StatCard
                 label="Başlangıçtan bu yana"
                 value={fmtTRY(totalChangeSinceStart, { sign: true })}
@@ -375,7 +344,7 @@ export default function PortfolioDashboard() {
                 );
             })()}
 
-            <div className="twoCol" style={styles.twoCol}>
+            <div style={styles.twoCol}>
               {/* Category breakdown */}
               <Panel title={month.display_name + ' — Kategori Dağılımı'}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
@@ -766,8 +735,8 @@ function StatCard({ label, value, sub, positive }) {
 
 function Panel({ title, children, noPad }) {
   return (
-    <div className="panel" style={styles.panel}>
-      <div className="panelTitle" style={styles.panelTitle}>{title}</div>
+    <div style={styles.panel}>
+      <div style={styles.panelTitle}>{title}</div>
       <div style={{ padding: noPad ? 0 : '18px 20px 20px' }}>{children}</div>
     </div>
   );
