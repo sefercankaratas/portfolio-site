@@ -212,8 +212,40 @@ export default function PortfolioDashboard() {
         .scrollbar-thin::-webkit-scrollbar { height: 6px; width: 6px; }
         .scrollbar-thin::-webkit-scrollbar-thumb { background: #3a3530; border-radius: 4px; }
         .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+        .portfolio-sidebar { position: fixed; z-index: 20; inset: 0 auto 0 0; width: 236px; background: #071a2c; border-right: 1px solid #1d3c53; display: flex; flex-direction: column; padding: 29px 15px; box-shadow: 12px 0 40px #020c1822; }
+        .portfolio-sidebar-brand { padding: 4px 13px 32px; font-size: 19px; font-weight: 700; color: #eaf8ff; letter-spacing: -.035em; }
+        .portfolio-sidebar-brand span { color: #35e1be; }
+        .portfolio-sidebar-label { color: #66849a; font: 10px 'IBM Plex Mono', monospace; letter-spacing: .16em; padding: 0 13px 13px; }
+        .portfolio-sidebar-button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 13px 14px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: #9cb4c6; font: 12px 'IBM Plex Mono', monospace; text-align: left; cursor: pointer; margin-bottom: 5px; }
+        .portfolio-sidebar-button.active { background: linear-gradient(90deg,#123d50,#0e3045); color: #54f2d1; border-color: #205669; }
+        .portfolio-sidebar-button:hover { background: #12344a; color: #e6ffff; }
+        .portfolio-sidebar-foot { margin-top: auto; padding: 17px 12px; border-top: 1px solid #1c3b50; font-size: 11px; color: #7694a8; line-height: 1.8; }
+        .portfolio-content { margin-left: 236px; min-width: 0; }
+        .portfolio-content main { max-width: 1500px; }
+        .portfolio-content .portfolio-mobile-tabs { display: none !important; }
+        @media (max-width: 900px) { .portfolio-sidebar { width: 74px; padding: 22px 8px; } .portfolio-sidebar-brand { font-size: 12px; padding: 6px 3px 25px; text-align: center; } .portfolio-sidebar-brand span, .portfolio-sidebar-label, .portfolio-nav-text, .portfolio-sidebar-foot { display: none; } .portfolio-sidebar-button { justify-content: center; padding: 13px 5px; font-size: 19px; } .portfolio-content { margin-left: 74px; } }
+        @media (max-width: 580px) { .portfolio-sidebar { display: none; } .portfolio-content { margin-left: 0; } .portfolio-content .portfolio-mobile-tabs { display: flex !important; } }
+        @media (min-width: 581px) { .portfolio-content .portfolio-mobile-tabs { display: none !important; } }
+        .portfolio-content .row-hover:hover { background: #14354a !important; }
+        .portfolio-content button:focus-visible, .portfolio-sidebar-button:focus-visible { outline: 2px solid #39e8c6; outline-offset: 2px; }
+
       `}</style>
 
+      <aside className="portfolio-sidebar">
+        <div className="portfolio-sidebar-brand">◈ PORTFÖY<span>360</span></div>
+        <div className="portfolio-sidebar-label">PORTFÖY YÖNETİMİ</div>
+        {[
+          ['genel', '◫', 'Genel Bakış'], ['hisse', '▥', 'Hisse Senetleri'],
+          ['fon', '◈', 'Yatırım Fonları'], ['altin', '◆', 'Kıymetli Madenler'],
+          ['btc', '₿', 'Bitcoin'], ['etf', '◉', 'ETF / Endeks']
+        ].map(([id, glyph, label]) => (
+          <button key={id} type="button" title={label} className={'portfolio-sidebar-button' + (tab === id ? ' active' : '')} onClick={() => setTab(id)}>
+            <span style={{ fontSize: 19, width: 22, textAlign: 'center' }}>{glyph}</span><span className="portfolio-nav-text">{label}</span>
+          </button>
+        ))}
+        <div className="portfolio-sidebar-foot">PORTFÖY RAPORU<br />{month.report_date}<br />Tüm veriler aylık ekstrelerden</div>
+      </aside>
+      <div className="portfolio-content">
       <div style={styles.bgTexture} />
 
       <div style={styles.ticker}>
@@ -281,7 +313,7 @@ export default function PortfolioDashboard() {
 
       <main style={styles.main}>
         {/* Tabs */}
-        <div style={styles.tabs}>
+        <div style={styles.tabs} className="portfolio-mobile-tabs">
           {[
             { id: 'genel', label: 'Genel Bakış' },
             { id: 'hisse', label: 'Hisseler' },
@@ -858,6 +890,7 @@ export default function PortfolioDashboard() {
       <footer style={styles.footer}>
         <span>{MONTH_ORDER.length} aylık kayıt · {firstMonth.display_name}-{month.display_name} 2026</span>
       </footer>
+      </div>
     </div>
   );
 }
