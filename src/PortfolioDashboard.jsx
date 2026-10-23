@@ -700,6 +700,43 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
  .pt-app .pd-scroll,.pt-app .pt-scroll,.pt-app .pd-stock-legend{scrollbar-width:none;-ms-overflow-style:none}.pt-app .pd-scroll::-webkit-scrollbar,.pt-app .pt-scroll::-webkit-scrollbar,.pt-app .pd-stock-legend::-webkit-scrollbar{display:none;width:0;height:0}
  .pt-app .pd-scroll{max-height:min(65vh,560px);overflow:auto;position:relative;overscroll-behavior-y:auto}.pt-app .pt-scroll{position:relative;overscroll-behavior-y:auto}.pt-app .pt-summary-scroll{max-height:none;overflow-x:auto;overflow-y:visible;overscroll-behavior-y:auto}.pt-app .pd-scroll thead th,.pt-app .pt-scroll thead th{position:sticky;top:0;z-index:3;background:#0b263f;box-shadow:0 1px 0 #28506a;background-clip:padding-box}.pt-app .pd-dialog .pd-scroll{max-height:min(45vh,360px);overscroll-behavior-y:contain}
 .pt-app .pt-top-right .pt-switch{flex-direction:row;align-self:center}.pt-app th .pt-sort-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:24px;background:transparent!important;border:0!important;border-radius:0!important;padding:0!important;box-shadow:none!important;color:inherit;font:inherit;text-align:left;white-space:nowrap;cursor:pointer}.pt-app th .pt-sort-heading.pt-sort-active{color:#27dbb4;font-weight:700;text-shadow:0 0 12px #27dbb433}.pt-app .pt-sort-heading:focus-visible{outline:2px solid #27dbb4;outline-offset:4px}@media(pointer:coarse){.pt-app th .pt-sort-heading{min-height:44px}}
+
+/* Consistent surfaces and hierarchy; portfolio content stays intact. */
+.pt-app{background:radial-gradient(ellipse at 70% 0%,#113451 0%,transparent 48%),#041426}
+.pt-app .pt-main{padding:24px 24px 36px}
+.pt-app .pt-top{padding-bottom:18px;border-bottom:1px solid #18364f;margin-bottom:20px}
+.pt-app .pt-top h1{letter-spacing:-.5px;font-weight:600}
+.pt-app .pt-card,.pt-app .pt-details .pd-card{background:linear-gradient(160deg,#0a223a,#071a2e);border-color:#224158;border-radius:15px;box-shadow:0 5px 18px #00000012}
+.pt-app .pt-card h3{font-weight:600;letter-spacing:-.15px}
+.pt-app .pt-side{background:#06182a;border-right-color:#1d384e}
+.pt-app .pt-nav button{border-radius:9px;transition:background .15s,color .15s}
+.pt-app .pt-nav button:hover{background:#102e44;color:#edf6ff}
+.pt-app .pt-nav button.active{background:#103d42;box-shadow:inset 3px 0 #12e6b1;color:#dffff5}
+.pt-app .pt-foot{background:#0a2033;border-color:#234056}
+.pt-app .pt-stat{min-height:116px;align-items:center;padding:18px 16px}
+.pt-app .pt-stat .pt-icon{border-radius:13px;width:38px;height:38px}
+.pt-app .pt-stat b{letter-spacing:-.45px;font-variant-numeric:tabular-nums}
+.pt-app .pt-table td,.pt-app .pd-table td{font-variant-numeric:tabular-nums}
+.pt-app .pt-table th{color:#aac4d8}
+.pt-app .pt-table tbody tr:hover{background:#123047}
+.pt-app .portfolio-note summary{color:#a6c4d9}
+.pt-app .portfolio-note[open]{border-top:1px solid #234157;padding-top:4px}
+@container portfolio-center (min-width:1040px){
+ .pt-app .pt-monthly-panels{align-items:stretch;gap:0;border:1px solid #27465d;border-radius:15px;background:linear-gradient(150deg,#0a223a,#071a2e);overflow:clip}
+ .pt-app .pt-monthly-panels>.pt-card{display:flex;flex-direction:column;background:transparent;border:0;border-radius:0;box-shadow:none;padding:16px!important}
+ .pt-app .pt-monthly-panels>.pt-monthly-trades{border-right:1px solid #27465d}
+ .pt-app .pt-monthly-panels h3{min-height:34px;margin-bottom:0;line-height:1.4}
+ .pt-app .pt-monthly-panels .pt-table thead th{height:48px;padding:9px 7px;background:#102c43}
+ .pt-app .pt-monthly-panels .pt-table tbody td{height:51px;padding:9px 7px;font-size:12px}
+ .pt-app .pt-monthly-panels .pt-table tfoot th,.pt-app .pt-monthly-panels .pt-table tfoot td{height:50px;padding:9px 7px;border-top:1px solid #345367;background:#0b263d}
+ .pt-app .pt-monthly-panels .pt-monthly-trades>.pt-summary-scroll{flex:1;display:flex}
+ .pt-app .pt-monthly-panels .pt-monthly-trades .pt-table{align-self:stretch}
+ .pt-app .pt-monthly-panels .pt-monthly-trades>.pt-note{margin-top:12px!important;line-height:1.6}
+ .pt-app .pt-monthly-panels .portfolio-note{margin-top:8px!important}
+}
+@media(max-width:850px){.pt-app .pt-main{padding:16px}.pt-app .pt-top{padding-bottom:14px}.pt-app .pt-stat{padding:14px;min-height:105px}}
+@media(max-width:520px){.pt-app .pt-main{padding:10px}.pt-app .pt-stat{min-height:95px}}
+@media(prefers-reduced-motion:reduce){.pt-app .pt-nav button{transition:none}}
 `}</style><aside className="pt-side"><div className="pt-brand"><div className="pt-logo"><UiIcon name="chart-no-axes-combined" size={29}/></div><div>Portföy Takip<small>Yatırımlarım</small></div></div><nav className="pt-nav" aria-label="Ana menü">{menu.map(s=><button key={s} className={section===s?'active':''} onClick={()=>go(s)}><SectionIcon section={s} size={21}/><em style={{fontStyle:'normal'}}>{s}</em></button>)}</nav><div className="pt-foot">↗ &nbsp; Daha iyi bir gelecek için bugünden yatırım yapın.</div></aside>
  <main className="pt-main"><header className="pt-top"><div><h1>{section==='Ana Sayfa'?'Portföy Özeti':section}</h1><div className="pt-muted">Yatırımların, geleceğin için çalışıyor.</div></div><div className="pt-top-right"><div className="pt-switch" role="group" aria-label="Para birimi"><button className={currency==='TRY'?'on':''} aria-pressed={currency==='TRY'} onClick={()=>setCurrency('TRY')}>TL</button><button className={currency==='USD'?'on':''} aria-pressed={currency==='USD'} onClick={()=>setCurrency('USD')}>USD</button></div>{section!=='Temettüler'&&<select className="pt-select" aria-label="Görüntülenen ay" value={idx} onChange={e=>setIdx(Number(e.target.value))}>{MONTH_ORDER.map((k,i)=><option key={k} value={i}>{DISPLAY_DATA[k].display_name} 2026</option>)}</select>}</div></header>
  {section!=='Temettüler'&&m.btc_estimate&&<div className="pt-card" style={{marginBottom:14}}><strong>Haziran BTC · Kullanıcı Onaylı Tahmin</strong><div className="pt-note">Ay sonu {number(m.btc_estimate.qty,9)} BTC ve ortalama maliyet Temmuz ekstresinden geriye taşındı; Temmuz’da kayda geçmeyen başka işlem olmadığı varsayıldı. Görsellerden 14 alış, toplam ₺26.764,85 eklendi. İşlem başına adetler tutar oranında tahmini dağıtıldı; fiyat ve ücretler bilinmiyor. Değerleme: 30 Haziran kapanışı ${number(m.btc_estimate.closeUSD,2)} × ayın kayıtlı USD/TL kuru.</div></div>}{section!=='Ana Sayfa'?<div className="pt-details"><DetailedPortfolio key={section} idx={idx} section={section} currency={currency} setIdx={setIdx} setSection={setSection}/></div>:<div className="pt-layout"><div className="pt-center"><div className="pt-stats">{[['▣','Toplam Portföy Değeri',m.total_try],['▤','Hisse Senetleri',cats[2].value],['↗','Yatırım Fonları',cats[1].value],['%','Kıymetli Madenler',cats[0].value]].map(([ico,label,value],i)=><div className="pt-card pt-stat" key={label}><span className="pt-icon">{ico}</span><div><div>{label}</div><b>{money(value)}</b>{i===0?<div className={change==null?'pt-small':change>=0?'pt-positive':'pt-negative'}>{change==null?'İlk kayıt':(change>=0?'▲ ':'▼ ')+percent(Math.abs(change))} <span className="pt-small">(Önceki aya göre değer değişimi)</span></div>:<span className="pt-small">Portföyün {percent(value/m.total_try)}'i</span>}</div></div>)}</div>
