@@ -1178,7 +1178,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='aec56148c9cc87af85e94eba59d5c7097ce219ef2d0ea583b93bef77d83ca38a';
+const UPD_SOURCE_SHA256='1042789eb593cc9cc3f82cd1d7c296574b6cdddd3480208894d2caa0a1a2e2f1';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
@@ -1545,9 +1545,9 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
 .pt-app .portfolio-note summary{color:#a6c4d9}
 .pt-app .portfolio-note[open]{border-top:1px solid #234157;padding-top:4px}
 @container portfolio-center (min-width:1040px){
- .pt-app .pt-monthly-panels{align-items:stretch;gap:0;border:1px solid #27465d;border-radius:15px;background:linear-gradient(150deg,#0a223a,#071a2e);overflow:clip}
- .pt-app .pt-monthly-panels>.pt-card{display:flex;flex-direction:column;background:transparent;border:0;border-radius:0;box-shadow:none;padding:16px!important}
- .pt-app .pt-monthly-panels>.pt-monthly-trades{border-right:1px solid #27465d}
+ .pt-app .pt-monthly-panels{align-items:stretch;gap:14px;border:0;border-radius:0;background:transparent;overflow:visible}
+ .pt-app .pt-monthly-panels>.pt-card{display:flex;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:15px;box-shadow:none;padding:16px!important}
+ .pt-app .pt-monthly-panels>.pt-monthly-trades{border-right:1px solid var(--line)}
  .pt-app .pt-monthly-panels h3{min-height:34px;margin-bottom:0;line-height:1.4}
  .pt-app .pt-monthly-panels .pt-table thead th{height:48px;padding:9px 7px;background:#102c43}
  .pt-app .pt-monthly-panels .pt-table tbody td{height:51px;padding:9px 7px;font-size:12px}
@@ -1619,7 +1619,7 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
 .pt-app .pt-scroll table.pt-table thead th,.pt-app .pd-scroll table thead th,.pt-app .pt-monthly-panels .pt-scroll table.pt-table thead th{background:#1a1d23;border-color:#30343d;box-shadow:0 1px 0 #343842}
 .pt-app .pt-scroll table.pt-table tfoot th,.pt-app .pt-scroll table.pt-table tfoot td,.pt-app .pt-monthly-panels .pt-scroll table.pt-table tfoot th,.pt-app .pt-monthly-panels .pt-scroll table.pt-table tfoot td{background:#1b1e25;border-color:#343842}
 @container portfolio-center (min-width:1040px){
- .pt-app .pt-monthly-panels{background:#15171c;border-color:#2c3038}
+ .pt-app .pt-monthly-panels{background:transparent;border:0}
  .pt-app .pt-monthly-panels>.pt-card+.pt-card{border-left-color:#2c3038}
 }
 .pt-app .pt-investor-quote{padding:13px 12px;background:#171a20;border-color:#2c3038;min-width:0}
@@ -1646,7 +1646,7 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
 .pt-app[data-theme="light"] .pd-theme-chip{background:#f2f5f8!important;border-color:#dce2ea;color:#3b4b62!important}.pt-app[data-theme="light"] .pd-theme-chip[aria-pressed=true]{background:#e2f3ec!important;border-color:#9fcdbb}.pt-app[data-theme="light"] .pd-theme-heading th{background:#edf3f6;color:#3b4b62}.pt-app[data-theme="light"] .pd-readable-weighted-map>.pd-fund-tile{border-color:#dce2ea;color:#243146}.pt-app[data-theme="light"] .pd-fund-tile[data-map-direction="up"]{background:#dff2e9!important;color:#0d674c}.pt-app[data-theme="light"] .pd-fund-tile[data-map-direction="down"]{background:#fbe5eb!important;color:#a22f49}.pt-app[data-theme="light"] .pd-fund-tile[data-map-direction="flat"]{background:#edf1f6!important;color:#52647b}.pt-app[data-theme="light"] .pd-fund-tile-change{color:inherit!important}.pt-app[data-theme="light"] .pd-fund-tile-value,.pt-app[data-theme="light"] .pd-map-actual-share{color:inherit}.pt-app[data-theme="light"] .pd-portfolio-tile{background:#edf3f6!important;color:#243146}.pt-app[data-theme="light"] .pd-stock-legend,.pt-app[data-theme="light"] .pd-stock-legend button{color:#243146}.pt-app[data-theme="light"] .pd-fund-map-caption,.pt-app[data-theme="light"] .pd-theme-tools{color:#627087}
 .pt-app[data-theme="light"] .pt-month-summary[open]>summary{border-color:#dce2ea}.pt-app[data-theme="light"] .pt-month-summary-body{color:#3b4b62}.pt-app[data-theme="light"] .pt-export-menu,.pt-app[data-theme="light"] .pt-export-status{background:#fff;border-color:#d4dce6;color:#3b4b62}.pt-app[data-theme="light"] .pt-export-menu button{color:#243146}.pt-app[data-theme="light"] .pt-export-menu button:hover{background:#edf3f6}.pt-app[data-theme="light"] .pt-export-menu small,.pt-app[data-theme="light"] .pt-export-menu p{color:#627087}.pt-app[data-theme="light"] .pt-side-bottom .pt-export>details>summary{color:#627087;border-color:#dce2ea}.pt-app[data-theme="light"] .pt-investor-quote{background:#f4f7fa;border-color:#dce2ea}.pt-app[data-theme="light"] .pt-quote-card .pt-quote-text{color:#46566d}.pt-app[data-theme="light"] .pt-quote-card .pt-quote-author{color:#087658}
 .pt-app[data-theme="light"] svg.pt-chart text,.pt-app[data-theme="light"] svg.pd-chart text{fill:#5b6a80;stroke:none}.pt-app[data-theme="light"] svg.pt-chart text[paint-order],.pt-app[data-theme="light"] svg.pd-chart text[paint-order]{fill:#243146;stroke:#fff}.pt-app[data-theme="light"] svg.pt-chart line,.pt-app[data-theme="light"] svg.pd-chart line{stroke:#dce2ea}.pt-app[data-theme="light"] svg.pt-chart path[stroke],.pt-app[data-theme="light"] svg.pd-chart path[stroke]{stroke:#159a76}.pt-app[data-theme="light"] [data-monthly-benchmark]{border-top-color:#dce2ea!important}.pt-app[data-theme="light"] [data-benchmark-value^="-"] strong{color:#b63953!important}.pt-app[data-theme="light"] [data-benchmark-value]:not([data-benchmark-value^="-"]) strong{color:#087658!important}
-@container portfolio-center (min-width:1040px){.pt-app[data-theme="light"] .pt-monthly-panels{background:#fff;border-color:#dce2ea}.pt-app[data-theme="light"] .pt-monthly-panels>.pt-card+.pt-card{border-left-color:#dce2ea}}
+@container portfolio-center (min-width:1040px){.pt-app[data-theme="light"] .pt-monthly-panels{background:transparent;border:0}.pt-app[data-theme="light"] .pt-monthly-panels>.pt-card+.pt-card{border-left-color:#dce2ea}}
 @media(max-width:520px){.pt-app .pt-theme-toggle{font-size:11px;padding:6px 8px}.pt-app .pt-top-right{gap:6px}}
 
 .pt-app .pt-right .pt-month-summary-compact{margin:0;padding:13px}.pt-app .pt-month-summary-compact h3{margin:0 0 9px}.pt-app .pt-month-summary-compact .pt-month-summary-body{padding:0;font-size:12px;line-height:1.65}.pt-app .pt-month-summary-compact .pt-month-summary-body>p{margin:0 0 11px}.pt-app .pt-month-summary-compact .pt-month-summary-body>p:last-child{margin-bottom:0}.pt-app .pt-month-summary-compact .pt-note{font-size:11px}
