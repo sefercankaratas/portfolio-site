@@ -1178,7 +1178,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='1042789eb593cc9cc3f82cd1d7c296574b6cdddd3480208894d2caa0a1a2e2f1';
+const UPD_SOURCE_SHA256='02911d4779d7d441633d15161b9faa1647463dc57fc90e44550d53bd243d6582';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
@@ -1715,6 +1715,30 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
  .pt-app .pt-right>.pt-card{margin-bottom:0}
 }
 @media(max-width:1250px){.pt-app .pt-home-positions>.pt-scroll{height:auto;max-height:560px}}
+
+/* Home dashboard refinement: calmer hierarchy, tighter tables, clearer monthly summaries. */
+.pt-app .pt-stats{gap:12px}
+.pt-app .pt-stat{min-height:102px;padding:15px 14px;gap:12px}
+.pt-app .pt-stat:first-child{border-color:#2b5a68;background:linear-gradient(145deg,#0c2b42,#082335)}
+.pt-app .pt-stat b{display:block;margin:3px 0 5px;font-size:21px;line-height:1.15}
+.pt-app .pt-layout{gap:18px}
+.pt-app .pt-center,.pt-app .pt-right{gap:14px}
+.pt-app .pt-monthly-panels{gap:14px;margin-bottom:14px}
+.pt-app .pt-monthly-panels>.pt-card{padding:14px!important}
+.pt-app .pt-monthly-panels .pt-table thead th{height:auto;padding:7px 6px}
+.pt-app .pt-monthly-panels .pt-table tbody td{height:auto;padding:7px 6px}
+.pt-app .pt-home-positions{padding:14px}
+.pt-app .pt-home-positions .pt-table thead th{padding:9px 8px}
+.pt-app .pt-home-positions .pt-table tbody td{padding:8px 8px}
+.pt-app .pt-home-positions .pt-table tbody td small{display:block;margin-top:3px;opacity:.78}
+.pt-app .pt-right>.pt-card{padding:15px}
+.pt-app .pt-right .pt-row{padding:5px 0}
+.pt-app .pt-right [data-real-performance] strong{font-variant-numeric:tabular-nums}
+.pt-app .pt-right [data-monthly-benchmark]{margin-top:12px!important;padding-top:11px!important}
+.pt-app .pt-right [data-monthly-benchmark]>div[style*="grid"]{gap:9px!important}
+.pt-app .pt-table td{line-height:1.35}
+@media(max-width:850px){.pt-app .pt-layout{gap:14px}.pt-app .pt-stats{gap:9px}.pt-app .pt-stat{min-height:92px;padding:12px}}
+@media(max-width:520px){.pt-app .pt-monthly-panels{gap:10px}.pt-app .pt-home-positions{padding:10px}}
 `}</style><aside className="pt-side"><div className="pt-brand"><div className="pt-logo"><UiIcon name="chart-no-axes-combined" size={29}/></div><div>Portföy Takip<small>Yatırımlarım</small></div></div><nav className="pt-nav" aria-label="Ana menü">{menu.map(s=><button key={s} className={section===s?'active':''} onClick={()=>go(s)}><UiIcon name={SECTION_ICONS[s]||'layers'} size={21}/><em style={{fontStyle:'normal'}}>{s}</em></button>)}</nav><div className="pt-side-bottom"><PortfolioExport idx={idx} currency={currency} goal={goalTarget}/><InvestorQuote/></div></aside>
  <main className="pt-main"><header className="pt-top"><div><h1>{section==='Ana Sayfa'?'Portföy Özeti':section}</h1><div className="pt-muted">Yatırımların, geleceğin için çalışıyor.</div></div><div className="pt-top-right"><button type="button" className="pt-theme-toggle" data-theme-toggle="true" aria-label="Açık/koyu tema değiştir" aria-pressed={appearance==='light'} onClick={()=>setAppearance(t=>t==='dark'?'light':'dark')}><span aria-hidden="true">{appearance==='dark'?'☀':'☾'}</span></button><button type="button" className="pt-theme-toggle pt-currency-toggle" data-currency-toggle="true" aria-label={currency==='TRY'?'Para birimi: TL. USD’ye geç':'Para birimi: USD. TL’ye geç'} onClick={()=>setCurrency(c=>c==='TRY'?'USD':'TRY')}><span aria-hidden="true">{currency==='TRY'?'₺':'$'}</span></button>{section!=='Temettüler'&&<select className="pt-select" aria-label="Görüntülenen ay" value={idx} onChange={e=>setIdx(Number(e.target.value))}>{MONTH_ORDER.map((k,i)=><option key={k} value={i}>{DISPLAY_DATA[k].display_name} {DISPLAY_DATA[k].report_date.slice(-4)}</option>)}</select>}</div></header>
  {section==='Ayı Güncelle'?<MonthlyUpdater onCommitted={(next,navigate=true)=>{setIdx(next);if(navigate)go('Ana Sayfa')}}/>:section!=='Ana Sayfa'?<div className="pt-details"><DetailedPortfolio key={section} idx={idx} section={section} currency={currency} setIdx={setIdx} setSection={setSection} goalTarget={goalTarget} onGoalChange={setGoalTarget}/></div>:<div className="pt-layout"><div className="pt-center"><div className="pt-stats">{[['▣','Toplam Portföy Değeri',m.total_try],...[['▤','Hisse Senetleri',cats[2].value],['↗','Yatırım Fonları',cats[1].value],['%','Kıymetli Madenler',cats[0].value]].sort((a,b)=>b[2]-a[2])].map(([ico,label,value],i)=><div className="pt-card pt-stat" key={label}><span className="pt-icon">{ico}</span><div><div>{label}</div><b>{money(value)}</b>{i===0?<div className={change==null?'pt-small':change>=0?'pt-positive':'pt-negative'}>{change==null?'İlk kayıt':(change>=0?'▲ ':'▼ ')+percent(Math.abs(change))} <span className="pt-small">(Önceki aya göre değer değişimi)</span></div>:<span className="pt-small">Portföyün {percent(value/m.total_try)}'i</span>}</div></div>)}</div>
