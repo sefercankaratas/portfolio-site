@@ -1076,7 +1076,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='3597499dc863e71ff48ace9235c0c68bcdc194405ccc6439b2e17bf80055e94f';
+const UPD_SOURCE_SHA256='519387f7fb77a157115069b3dcd2949e4a7b4df0c1476e88167c78d0f436ebde';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
@@ -1178,9 +1178,22 @@ function updValidateBackup(data){if(!data||data.schema!==UPD_SCHEMA||data.base!=
  try{for(const d of data.months){updSafeDraft(d);const old=UPD_ACTIVE.find(x=>x.period===d.period);if(old){if(JSON.stringify(old)!==JSON.stringify(d))throw Error(d.period+': mevcut ayla çelişen yedek.');continue}updInstall(d,false)}}finally{for(const k of MONTH_ORDER.filter(k=>!saved.keys.includes(k)))delete DISPLAY_DATA[k];MONTH_ORDER.splice(0,MONTH_ORDER.length,...saved.keys);RECORDED_TRADES.length=saved.tradeLength;DIVIDEND_ROWS.length=saved.incomeLength;VERIFIED_BANK_FUND_HISTORY.length=saved.historyLength;VERIFIED_BANK_CLOSED_COSTS.length=saved.closeLength;UPD_ACTIVE.length=saved.activeLength;Object.assign(MONTHLY_MARKET_DATA,saved.market);Object.assign(BENCHMARK_DATA,saved.bench)}}
 function updRestore(data){updValidateBackup(data);for(const d of data.months)if(!UPD_ACTIVE.some(x=>x.period===d.period))updInstall(d,false);try{localStorage.setItem('portfolio-updates-v1',JSON.stringify(updEnvelope()))}catch{UPD_BOOT_ISSUES.push('Yedek tarayıcıya kaydedilemedi. JSX ve veri yedeğini indir.')}}
 
-let updLibrariesPromise,updSheetPromise;
+let updLibrariesPromise,updSheetPromise,updModuleSequence=0;
 async function updInflate(encoded){const stream=new Blob([Uint8Array.from(atob(encoded),c=>c.charCodeAt(0))]).stream().pipeThrough(new DecompressionStream('gzip'));return new Response(stream).text()}
-async function updLibraries(kind='pdf'){const moduleURL=async s=>URL.createObjectURL(new Blob([await updInflate(s)],{type:'text/javascript'}));if(kind==='sheet'){if(!updSheetPromise)updSheetPromise=(async()=>({XLSX:await import(/* @vite-ignore */ await moduleURL(UPD_XLSX))}))();return updSheetPromise}if(!UPD_PDF_MAIN)throw Error('Bu önizlemede PDF okuma kapalı; indirilen JSX sürümünde kullanılabilir.');if(!updLibrariesPromise)updLibrariesPromise=(async()=>{const main=await moduleURL(UPD_PDF_MAIN),worker=await moduleURL(UPD_PDF_WORKER),pdf=await import(/* @vite-ignore */ main);globalThis.pdfjsWorker=await import(/* @vite-ignore */ worker);return {pdf}})();return updLibrariesPromise}
+function updLoadModule(url){return new Promise((resolve,reject)=>{
+ const key='__portfolioModule_'+(++updModuleSequence),script=document.createElement('script');
+ const wrapper=URL.createObjectURL(new Blob(['import * as reader from '+JSON.stringify(url)+';globalThis['+JSON.stringify(key)+'].resolve(reader);'],{type:'text/javascript'}));
+ const clean=()=>{delete globalThis[key];script.remove();URL.revokeObjectURL(wrapper)};
+ globalThis[key]={resolve:module=>{clean();resolve(module)}};
+ script.type='module';script.src=wrapper;script.onerror=()=>{clean();reject(Error('Dosya okuyucusu yüklenemedi. Tarayıcının yerel modüllere izin verdiğinden emin ol.'))};document.head.appendChild(script);
+ })}
+function updLibraries(kind='pdf'){
+ const moduleURL=encoded=>updInflate(encoded).then(code=>URL.createObjectURL(new Blob([code],{type:'text/javascript'})));
+ if(kind==='sheet'){if(!updSheetPromise)updSheetPromise=moduleURL(UPD_XLSX).then(updLoadModule).then(XLSX=>({XLSX})).catch(e=>{updSheetPromise=null;throw e});return updSheetPromise}
+ if(!UPD_PDF_MAIN)return Promise.reject(Error('Bu önizlemede PDF okuma kapalı; indirilen JSX sürümünde kullanılabilir.'));
+ if(!updLibrariesPromise)updLibrariesPromise=Promise.all([moduleURL(UPD_PDF_MAIN),moduleURL(UPD_PDF_WORKER)]).then(([main,worker])=>Promise.all([updLoadModule(main),updLoadModule(worker)])).then(([pdf,worker])=>{globalThis.pdfjsWorker=worker;return {pdf}}).catch(e=>{updLibrariesPromise=null;throw e});
+ return updLibrariesPromise;
+}
 function updCellNum(v){if(typeof v==='number')return v;const s=String(v??'').replace(/\s*(TRY|TL|USD)$/i,'').trim();return updNum(s.includes(',')?s:/^[+-]?[1-9]\d{0,2}(?:\.\d{3})+$/.test(s)?s.replace(/\./g,''):s)}
 function updNorm(s){return String(s??'').toLocaleLowerCase('tr-TR').replace(/ı/g,'i').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'')}
 function updCode(s){return String(s??'').trim().toUpperCase()==='BTC'?'Bitcoin':String(s??'').trim()}
