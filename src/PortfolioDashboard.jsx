@@ -1208,7 +1208,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='f42b8783749ece33be01f0bb5cee3a239c95ece771458b45b72819abddb6cd9d';
+const UPD_SOURCE_SHA256='2a7f3b02644410906939b7e6524154b65e6ce964a1a0b92e732b537f90039deb';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
@@ -1885,7 +1885,7 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
 .pt-app .pv-analysis-pair>.pd-card>.pd-heading,.pt-app .pv-analysis-pair>.pt-card>.pd-heading{margin:0 0 12px!important;min-height:42px;align-items:flex-start}
 .pt-app .pv-analysis-pair>.pd-card>.pd-heading h2,.pt-app .pv-analysis-pair>.pt-card>.pd-heading h2{font-size:14px!important;line-height:20px;margin:0 0 3px!important}
 .pt-app .pv-analysis-pair>.pd-card>.pd-heading small,.pt-app .pv-analysis-pair>.pt-card>.pd-heading small{display:block;font-size:11px;line-height:16px}
-@media(min-width:1450px){.pv-analysis-pair{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}.pt-app .pv-analysis-pair table thead tr{height:54px}.pt-app .pv-analysis-pair table thead th{vertical-align:middle}}
+@media(min-width:1450px){.pv-analysis-pair{grid-template-columns:repeat(2,minmax(0,1fr))}.pt-app .pv-analysis-pair table thead tr{height:54px}.pt-app .pv-analysis-pair table thead th{vertical-align:middle}}
 
 @media(min-width:701px){.pt-app .pd-app .pd-dialog{max-width:min(1000px,95vw)}.pt-app [data-position-panel]{margin:0}.pt-app .pd-history-trades .pd-card{height:100%}.pt-app .pd-app .pd-tabletools{margin-bottom:8px}.pt-app .pd-app .pd-stats{margin:0}.pt-app .pd-app table th .pt-sort-heading{font-size:12px}.pt-app .pd-app .pd-content{gap:12px}}
 @media(max-width:700px){.pv-analysis-pair{grid-template-columns:1fr}.pt-app .pd-history-trades{grid-template-columns:1fr}.pt-app [data-asset-history] .pd-note{display:none}}
