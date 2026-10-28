@@ -1274,7 +1274,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='bf769a9bee1b8dd2325ee887825a5fb63c865aae41337a74d5bfaf5a226611f5';
+const UPD_SOURCE_SHA256='20297fce6a1ffd39c2626df0f11675a654640a5f771dacac766c8b598c1a264b';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
@@ -1651,19 +1651,21 @@ function AssetTradeChart({code,platform,maxIdx=MONTH_ORDER.length-1,currency='TR
  const activateGroup=g=>{setSelected(g.trades[0].id);setOpenGroup(current=>!(current?.length===g.trades.length&&g.trades.every(t=>current.includes(t.id)))?g.trades.map(t=>t.id):null)};
  const labelPoints=points.filter((p,i)=>i===0||i===points.length-1||i%Math.max(1,Math.ceil(points.length/(width<450?3:6)))===0);
  const priceLabels=[],costLabels=[],occupied=[],lineSegments=[],dataMarks=[];
- for(const [field,dateField] of [['price','date'],['cost','costDate']]){let previous=null;for(const p of history){if(p[field]==null){previous=null;continue}const point={x:x(p[dateField]),y:y(p[field])};dataMarks.push(point);if(previous)lineSegments.push([previous,point]);previous=point}}
+ for(const [field,dateField] of [['price','date'],['cost','costDate']]){let previous=null;for(const p of history){if(p[field]==null){previous=null;continue}const point={x:x(p[dateField]),y:y(p[field]),field,key:p.key};dataMarks.push(point);if(previous)lineSegments.push([previous,point]);previous=point}}
  const lineHitsRect=([a,b],r)=>{let lo=0,hi=1;const dx=b.x-a.x,dy=b.y-a.y;for(const [p,q] of [[-dx,a.x-r.left],[dx,r.right-a.x],[-dy,a.y-r.top],[dy,r.bottom-a.y]]){if(Math.abs(p)<1e-9){if(q<0)return false;continue}const t=q/p;if(p<0)lo=Math.max(lo,t);else hi=Math.min(hi,t);if(lo>hi)return false}return true};
  const placeLabel=(p,value,date,kind,mandatory=false)=>{
   const text=(kind==='cost'?(currency==='USD'?'$':'₺'):'')+number(value,value<1?4:2),tw=text.length*7+8,cx=Math.max(left+tw/2,Math.min(width-right-tw/2,x(date)));
-  const offsets=kind==='cost'?[22,-18,40,-36,58,-54,76,-72,94,-90,112,-108,130,-126,148,-144,166,-162]:[-18,26,-36,44,-54,62,-72,80,-90,98,-108,116,-126,134,-144,152,-162];
+  const offsets=kind==='cost'?[20,-18,26,-26]:[-18,22,-26,26];
   for(const offset of offsets){const cy=y(value)+offset,rect={left:cx-tw/2,right:cx+tw/2,top:cy-13,bottom:cy+5};
    if(rect.top<8||rect.bottom>bottom+3)continue;
    const padded={left:rect.left-3,right:rect.right+3,top:rect.top-3,bottom:rect.bottom+3};
-   const overlaps=occupied.some(r=>rect.left<r.right+5&&rect.right>r.left-5&&rect.top<r.bottom+4&&rect.bottom>r.top-4)||markerGroups.some(g=>g.cx+g.radius+6>rect.left&&g.cx-g.radius-6<rect.right&&g.cy+g.radius+6>rect.top&&g.cy-g.radius-6<rect.bottom)||dataMarks.some(m=>m.x+5>rect.left&&m.x-5<rect.right&&m.y+5>rect.top&&m.y-5<rect.bottom)||lineSegments.some(segment=>lineHitsRect(segment,padded));
+   const ownDistance=Math.hypot(cx-x(date),cy-4-y(value));
+   const belongsElsewhere=dataMarks.some(m=>m.field===(kind==='cost'?'cost':'price')&&m.key!==p.key&&Math.hypot(cx-m.x,cy-4-m.y)+4<ownDistance);
+   const overlaps=belongsElsewhere||occupied.some(r=>rect.left<r.right+5&&rect.right>r.left-5&&rect.top<r.bottom+4&&rect.bottom>r.top-4)||markerGroups.some(g=>g.cx+g.radius+6>rect.left&&g.cx-g.radius-6<rect.right&&g.cy+g.radius+6>rect.top&&g.cy-g.radius-6<rect.bottom)||dataMarks.some(m=>m.x+5>rect.left&&m.x-5<rect.right&&m.y+5>rect.top&&m.y-5<rect.bottom)||lineSegments.some(segment=>lineHitsRect(segment,padded));
    if(!overlaps){occupied.push(rect);return {key:p.key,text,x:cx,y:cy}}
   }
-  // The latest cost gets a reserved top margin if the plot itself is fully occupied.
-  if(mandatory){const cy=17;occupied.push({left:cx-tw/2,right:cx+tw/2,top:cy-13,bottom:cy+5});return {key:p.key,text,x:cx,y:cy}}
+  // Keep the latest cost anchored close to its own point even in a crowded plot.
+  if(mandatory){const cy=Math.max(22,Math.min(bottom-6,y(value)-18));occupied.push({left:cx-tw/2,right:cx+tw/2,top:cy-13,bottom:cy+5});return {key:p.key,text,x:cx,y:cy}}
  };
  // Reserve the latest known cost label first, including on narrow screens.
  const costCandidates=costPoints.filter((p,i)=>i===costPoints.length-1||width>=450||i%Math.max(1,Math.ceil(costPoints.length/3))===0);
