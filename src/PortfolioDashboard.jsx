@@ -557,12 +557,14 @@ function roundedAxis(values) {
  return {top,step,ticks:Array.from({length:Math.round(top/step)+1},(_,i)=>i*step)};
 }
 function ValueChart({points,format,labelFormat=format,className='pd-chart',filled=false}) {
+ const chartRef=React.useRef(null),[chartWidth,setChartWidth]=useState(790);
+ useEffect(()=>{const node=chartRef.current;if(!node)return;const update=()=>setChartWidth(Math.max(640,node.clientWidth));update();const observer=new ResizeObserver(update);observer.observe(node);return()=>observer.disconnect()},[]);
  const {top,ticks}=roundedAxis(points.map(p=>p.value));
- const xy=(p,i)=>[90+i*650/Math.max(points.length-1,1),215-p.value/top*180];
+ const xy=(p,i)=>[90+i*(chartWidth-140)/Math.max(points.length-1,1),215-p.value/top*180];
  const path=points.map((p,i)=>`${i?'L':'M'}${xy(p,i).join(',')}`).join(' ');
- return <div style={{overflowX:'auto'}}><svg className={className} style={{minWidth:640,display:'block'}} viewBox="0 0 790 265" role="img" aria-label="Aylık portföy değerleri ve tutarları">
+ return <div ref={chartRef} style={{overflowX:'auto'}}><svg className={className} style={{minWidth:640,display:'block',height:265}} viewBox={"0 0 "+chartWidth+" 265"} role="img" aria-label="Aylık portföy değerleri ve tutarları">
  <defs><linearGradient id="valueFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#12e6b1" stopOpacity=".35"/><stop offset="1" stopColor="#12e6b1" stopOpacity="0"/></linearGradient></defs>
- {ticks.map(v=><g key={v}><line x1="90" x2="750" y1={215-v/top*180} y2={215-v/top*180} stroke="#193c52"/><text x="4" y={219-v/top*180} fill="#91aec2" fontSize="11">{format(v)}</text></g>)}
+ {ticks.map(v=><g key={v}><line x1="90" x2={chartWidth-40} y1={215-v/top*180} y2={215-v/top*180} stroke="#193c52"/><text x="4" y={219-v/top*180} fill="#91aec2" fontSize="11">{format(v)}</text></g>)}
  {filled&&<path d={`${path} L ${xy(points[points.length-1],points.length-1)[0]} 215 L 90 215 Z`} fill="url(#valueFill)"/>}<path d={path} fill="none" stroke="#12e6b1" strokeWidth="3"/>{points.map((p,i)=>{const [x,y]=xy(p,i);return <g key={p.label}><circle cx={x} cy={y} r="4" fill="#12e6b1"><title>{`${p.label}: ${labelFormat(p.value)}`}</title></circle><text x={x} y={i%2?y+23:y-14} textAnchor={i===0?'start':i===points.length-1?'end':'middle'} fill="#ddfff7" stroke="#061c30" strokeWidth="3" paintOrder="stroke" fontSize="11" fontWeight="600">{labelFormat(p.value)}</text><text x={x} y="251" textAnchor="middle" fill="#a9c0d0" fontSize="12">{p.label.slice(0,3)}</text></g>})}</svg></div>;
 }
 
@@ -1017,7 +1019,7 @@ function DetailedPortfolio({idx, section, currency, setIdx, setSection,goalTarge
  const [selectedCode,selectedPlatform]=String(selected||'').split('::');
  const detailPosition=selected?positions.find(p=>p.code===selectedCode&&(!selectedPlatform||p.platform===selectedPlatform)):null;
  const detailTrades=RECORDED_TRADES.filter(t=>t.code===selectedCode&&t.mi<=idx&&(!selectedPlatform||t.institution===selectedPlatform));
- const assetHistory=<div className={"pd-history-trades"+(section!=='Hisse Senetleri'&&!assetTrades.length?" pv-history-empty":"")}><section className="pd-card" data-asset-history="true"><h2>{section} · Aylık Değer Geçmişi</h2><ValueChart points={history} format={chartMoney} labelFormat={v=>(currency==='USD'?'$':'₺')+number(v,0)}/><p className="pd-note">Adet değişimleri ve fiyat hareketleri birlikte yansır; bu grafik yatırım getirisi değildir.</p></section>{section==='Hisse Senetleri'?<StockAllocation positions={scope} currency={currency} rate={rate} onSelect={code=>setSelected(code)}/>:assetTrades.length?<section className="pd-card pd-asset-trades"><h2>{m.display_name} · {section} Alım / Satımları</h2>{tradeTable(assetTrades)}</section>:<div className="pv-empty-trades" data-empty-trades="true">{m.display_name} · Bu ay {section.toLocaleLowerCase('tr-TR')} alım / satımı yok.</div>}</div>;
+ const assetHistory=<div className={"pd-history-trades"+(section!=='Hisse Senetleri'&&!assetTrades.length?" pv-history-empty":"")}><section className="pd-card" data-asset-history="true"><h2>{section} · Aylık Değer Geçmişi</h2><ValueChart points={history} format={chartMoney} labelFormat={v=>(currency==='USD'?'$':'₺')+number(v,0)}/><p className="pd-note">Adet değişimleri ve fiyat hareketleri birlikte yansır; bu grafik yatırım getirisi değildir.</p>{section!=='Hisse Senetleri'&&!assetTrades.length&&<div className="pv-empty-trades" data-empty-trades="true">{m.display_name} · Bu ay {section.toLocaleLowerCase('tr-TR')} alım / satımı yok.</div>}</section>{section==='Hisse Senetleri'?<StockAllocation positions={scope} currency={currency} rate={rate} onSelect={code=>setSelected(code)}/>:assetTrades.length?<section className="pd-card pd-asset-trades"><h2>{m.display_name} · {section} Alım / Satımları</h2>{tradeTable(assetTrades)}</section>:null}</div>;
  return <div className="pd-app"><style>{`
  .pd-app .pd-trade-stats{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:700px){.pd-app .pd-trade-stats{grid-template-columns:1fr}}
  .pd-app tfoot th,.pd-app tfoot td{background:#0a263d;font-weight:700;border-top:1px solid #21506b;white-space:nowrap}.pd-app tfoot tr:last-child th,.pd-app tfoot tr:last-child td{background:#0c3046;color:#dff6ef}.pd-app tfoot th{position:static;text-align:left}
@@ -1209,7 +1211,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='6d986308316d3275859f795621892be2d9cdd32b478c9599fe811e4674f62813';
+const UPD_SOURCE_SHA256='7fb3f97f1c079c0a8baf2e283c495f2e02c8547d9f23d18cc5df451cd49d312d';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
@@ -1714,7 +1716,7 @@ export default function PortfolioDashboard({initialSection='Ana Sayfa'}={}) {
 @media(max-width:520px){.pt-app .pt-theme-toggle{font-size:11px;padding:6px var(--pv-space-8)}.pt-app .pt-top-right{gap:6px}}
 
 .pt-app .pt-right .pt-month-summary-compact{margin:0;padding:13px}.pt-app .pt-month-summary-compact h3{margin:0 0 9px}.pt-app .pt-month-summary-compact .pt-month-summary-body{padding:0;font-size:12px;line-height:1.65}.pt-app .pt-month-summary-compact .pt-month-summary-body>p{margin:0 0 11px}.pt-app .pt-month-summary-compact .pt-month-summary-body>p:last-child{margin-bottom:0}.pt-app .pt-month-summary-compact .pt-note{font-size:11px}
-.pt-app[data-theme="light"] .pd-metric>span{color:#627087}.pt-app[data-theme="light"] .pd-stock-pie>div{background:#fff;color:#243146}.pt-app[data-theme="light"] .pd-stock-pie>div small{color:#627087}.pt-app[data-theme="light"] .pd-metal{background:#fff}.pt-app[data-theme="light"] .pd-metal>strong,.pt-app[data-theme="light"] .pd-metal-type{color:#92650b}
+.pt-app[data-theme="light"] .pd-metric>span{color:#627087}.pt-app[data-theme="light"] .pd-stock-pie>div{background:#fff;color:#243146}.pt-app[data-theme="light"] .pd-stock-pie>div small{color:#627087}.pt-app[data-theme="light"] .pd-metal{background:#fff}.pt-app[data-theme="light"] .pd-app .pd-metal>b{color:#243146}.pt-app[data-theme="light"] .pd-app .pd-metal>small:not(.up):not(.down){color:#52627a}.pt-app[data-theme="light"] .pd-metal>strong,.pt-app[data-theme="light"] .pd-metal-type{color:#92650b}
 /* Complete light-theme totals and strengthen small financial labels. */
 .pt-app[data-theme="light"] .pd-app table tfoot th,
 .pt-app[data-theme="light"] .pd-app table tfoot td,
