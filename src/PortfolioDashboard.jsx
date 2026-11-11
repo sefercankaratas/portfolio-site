@@ -510,7 +510,7 @@ function sameMoneyComparisonData(idx,period='recent',code='MAC',options={}){
 function useChartPointSelection(rows,root){
  const [selected,setSelected]=useState(null),[hovered,setHovered]=useState(null),keys=rows.map(r=>r.key),key=keys.includes(selected)?selected:keys.includes(hovered)?hovered:null,row=rows.find(r=>r.key===key)||rows.at(-1),clear=()=>{setSelected(null);setHovered(null)};
  useEffect(()=>{const outside=e=>{if(root.current&&!root.current.contains(e.target))clear()};document.addEventListener('pointerdown',outside);return()=>document.removeEventListener('pointerdown',outside)},[root]);
- const props=(id,label)=>({'data-chart-key':id,role:'button',tabIndex:0,'aria-label':label,'aria-pressed':selected===id,onPointerEnter:()=>setHovered(id),onFocus:()=>setHovered(id),onBlur:()=>setHovered(null),onClick:e=>{e.stopPropagation();setHovered(null);setSelected(previous=>previous===id?null:id)},onKeyDown:e=>{if(e.key==='Escape'){clear();return}if(e.key==='Enter'||e.key===' '){e.preventDefault();setHovered(null);setSelected(previous=>previous===id?null:id)}if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const next=keys[Math.max(0,Math.min(keys.length-1,keys.indexOf(id)+(e.key==='ArrowLeft'?-1:1)))];setSelected(next);const target=[...(root.current?.querySelectorAll('[data-chart-key]')||[])].find(n=>n.getAttribute('data-chart-key')===next);target?.focus()}}});
+ const props=(id,label)=>({'data-chart-key':id,role:'button',tabIndex:0,'aria-label':label,'aria-pressed':selected===id,onPointerEnter:e=>{if(e.pointerType!=='touch')setHovered(id)},onPointerCancel:()=>setHovered(null),onFocus:e=>{if(e.currentTarget.matches(':focus-visible'))setHovered(id)},onBlur:()=>setHovered(null),onClick:e=>{e.stopPropagation();setHovered(null);setSelected(previous=>previous===id?null:id)},onKeyDown:e=>{if(e.key==='Escape'){clear();return}if(e.key==='Enter'||e.key===' '){e.preventDefault();setHovered(null);setSelected(previous=>previous===id?null:id)}if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();const next=keys[Math.max(0,Math.min(keys.length-1,keys.indexOf(id)+(e.key==='ArrowLeft'?-1:1)))];setSelected(next);const target=[...(root.current?.querySelectorAll('[data-chart-key]')||[])].find(n=>n.getAttribute('data-chart-key')===next);target?.focus()}}});
  return {key,row,props,clear,leave:()=>setHovered(null)};
 }
 function useStoredHistoryPeriod(idx,key){
@@ -1557,7 +1557,7 @@ function PortfolioGoal({totalTry,fx,goal=DEFAULT_GOAL,onChange,className='pt-car
 // Local monthly ledger. No remote calls; only append validated months.
 const UPD_SCHEMA=1,UPD_BASE='portfolio-v90-20261025';
 const UPD_BUILD_ID='portfolio-updater-20261025-v1';
-const UPD_SOURCE_SHA256='f76f3a5bc4ea7a26a4346d73f8b96a3ec5f92d9ce63273eddb309614cf99b3ad';
+const UPD_SOURCE_SHA256='f950865690e71d210d2a8f8c60cc5bc4df812035e5ddf2b0cbbb3ce909a72136';
 const UPD_MONTH_NAMES=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 const UPD_PLATFORMS=['Midas','İş Bankası','Midas Kripto','Fiziki Altın'];
 const UPD_GROUPS=['Hisse Senetleri','Yatırım Fonları','Kıymetli Madenler','Bitcoin',"ETF'ler"];
